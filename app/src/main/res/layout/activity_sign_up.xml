@@ -25,11 +25,11 @@
         />
 
     <EditText
-        android:id="@+id/id_edit_text"
+        android:id="@+id/email_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="32sp"
-        android:hint="ID"
+        android:hint="email"
         android:layout_margin="16dp"
         />
 
@@ -38,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="32sp"
-        android:hint="PW"
+        android:hint="password"
         android:layout_margin="16dp"
         />
 
