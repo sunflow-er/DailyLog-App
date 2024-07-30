@@ -15,8 +15,9 @@ import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.ActivitySignInBinding
 
 private const val TAG = "SignInActivity"
-private const val EMAIL = "email"
-private const val PASSWORD = "password"
+private const val EMAIL_KEY = "email"
+private const val PASSWORD_KEY = "password"
+
 class SignInActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySignInBinding
     private lateinit var auth : FirebaseAuth
@@ -54,8 +55,9 @@ class SignInActivity : AppCompatActivity() {
     private fun openActivityResultLauncher() : ActivityResultLauncher<Intent> {
         val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result : ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
-                binding.emailEditText.setText(result.data?.getStringExtra(EMAIL))
-                binding.pwEditText.setText(result.data?.getStringExtra(PASSWORD))
+                // 회원가입 시에 입력한 이메일, 비밀번호 정보를 로그인 화면에 그대로 가져오기
+                binding.emailEditText.setText(result.data?.getStringExtra(EMAIL_KEY))
+                binding.pwEditText.setText(result.data?.getStringExtra(PASSWORD_KEY))
             }
         }
 
@@ -66,8 +68,11 @@ class SignInActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) { // 로그인 성공
                 Log.d(TAG, "signInWithEmail : success")
-                val user = auth.currentUser
-                // updateUI(user) // UI 업데이트
+
+                // 메인 화면으로 이동
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+
             } else { // 로그인에 실패할 경우
                 Log.w(TAG, "signInWithEmail : failure", task.exception)
                 Toast.makeText(this, "로그인 실패", Toast.LENGTH_SHORT).show() // 메시지 보여주기

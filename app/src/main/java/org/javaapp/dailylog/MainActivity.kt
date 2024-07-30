@@ -2,6 +2,7 @@ package org.javaapp.dailylog
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -20,8 +21,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         auth = Firebase.auth // FirebaseAuth 객체의 공유 인스턴스 가져오기
-
-
     }
 
     override fun onStart() {
