@@ -21,6 +21,7 @@
         android:textSize="32sp"
         android:hint="email"
         android:layout_margin="16dp"
+        android:inputType="textEmailAddress"
         />
 
     <EditText
@@ -30,6 +31,7 @@
         android:textSize="32sp"
         android:hint="password"
         android:layout_margin="16dp"
+        android:inputType="textPassword"
         />
 
     <Button
