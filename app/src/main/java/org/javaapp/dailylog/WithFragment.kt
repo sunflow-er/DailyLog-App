@@ -7,20 +7,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.FragmentWithBinding
 import org.javaapp.dailylog.databinding.ItemWithUserBinding
 
 class WithFragment : Fragment() {
     private lateinit var binding: FragmentWithBinding
-
-    // dummy data
-    val userList = listOf(
-        User(R.drawable.baseline_account_box_24, "A", "A's status message"),
-        User(R.drawable.baseline_account_box_24, "B", "B's status message"),
-        User(R.drawable.baseline_account_box_24, "C", "C's status message"),
-        User(R.drawable.baseline_account_box_24, "D", "D's status message"),
-        User(R.drawable.baseline_account_box_24, "E", "E's status message")
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,16 +38,39 @@ class WithFragment : Fragment() {
 
         binding.userRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = UserAdapter(userList)
+            adapter = UserAdapter(emptyList())
         }
+
+        // 파이어베이스 데이터베이스 사용자 리스트 정보 가져오기 (한 번만 가져오기)
+        Firebase.database.reference.child(Key.DB_USERS).addListenerForSingleValueEvent( object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val userList = mutableListOf<User>()
+
+                snapshot.children.forEach {
+                    val user = it.getValue(User::class.java)
+                    user ?: return
+
+                    if(user.id != Firebase.auth.currentUser!!.uid) {
+                        userList.add(user)
+                    }
+                }
+
+                binding.userRecyclerView.adapter = UserAdapter(userList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
     }
 
     private inner class UserHolder(private val binding: ItemWithUserBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(user : User) {
-            binding.userProfileImage.setImageResource(user.profileImage)
+            binding.userProfileImage.setImageResource(user.profileImage ?: R.drawable.baseline_account_box_24)
             binding.userNameText.text = user.name
-            binding.userStatusMessageText.text = user.status_message
+            binding.userStatusMessageText.text = user.statusMessage
         }
     }
 
