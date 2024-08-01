@@ -35,7 +35,8 @@ class MainActivity : AppCompatActivity() {
         logFragment = LogFragment.newInstance()
         myFragment = MyFragment.newInstance()
 
-        // 프래그먼트 컨테이너 초기화(설정)
+        // 프래그먼트 컨테이너 초기화(
+        // 설정)
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) // 현재 프래그먼트 정보 가져오기
         if (currentFragment == null) { // 현재 프래그먼트가 없다면
             val baseFragment = withFragment // WithFragment를 기본 프래그먼트로 설정

@@ -3,6 +3,7 @@ package org.javaapp.dailylog
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Contacts.SettingsColumns.KEY
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -11,7 +12,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.javaapp.dailylog.Key.Companion.DB_URL
+import org.javaapp.dailylog.Key.Companion.DB_USERS
 import org.javaapp.dailylog.databinding.ActivitySignInBinding
 
 private const val TAG = "SignInActivity"
@@ -66,6 +70,8 @@ class SignInActivity : AppCompatActivity() {
 
     private fun signIn(email : String, password : String) {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
+            val currentUser = auth.currentUser
+
             if (task.isSuccessful) { // 로그인 성공
                 Log.d(TAG, "signInWithEmail : success")
 
