@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.ActivitySignUpBinding
 
@@ -44,10 +45,22 @@ class SignUpActivity : AppCompatActivity() {
             if (task.isSuccessful) { // 계정 생성에 성공, 자동 로그인
                 Log.d(TAG, "createUserWithEmail : success")
 
+                // 회원가입 완료 시 해당 계정에 대한 정보를 firebase realtime database에 생성 및 저장
+                val currentUser = auth.currentUser!!
+                val currentUserId = currentUser.uid
+
+                val user = mutableMapOf<String, Any>() // 사용자 정보를 저장할 맵 생성
+                user["id"] = currentUserId
+                user["name"] = name
+                user["statusMessage"] = ""
+
+                Firebase.database(Key.DB_URL).reference // 파이어베이스 데이터베이스에 사용자 정보를 업데이트
+                    .child(Key.DB_USERS)
+                    .child(currentUserId)
+                    .updateChildren(user)
+
                 // 로그인 화면에서 로그인을 진행하기 위해 로그아웃
                 auth.signOut()
-                
-                // TODO 생성된 계정에 이름(name) 정보 추가
 
                 // 로그인 화면으로 이동
                 val intent = Intent().apply {
