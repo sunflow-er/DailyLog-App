@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -38,21 +39,22 @@ class WithFragment : Fragment() {
 
         binding.userRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = UserAdapter(emptyList())
+            // adapter = UserAdapter(emptyList())
         }
 
         // 파이어베이스 데이터베이스 사용자 리스트 정보 가져오기 (한 번만 가져오기)
         Firebase.database.reference.child(Key.DB_USERS).addListenerForSingleValueEvent( object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val userList = mutableListOf<User>()
+                val userList = mutableListOf<User>() // 화면에 보여줄 사용자를 담을 리스트
+                val currentUserId = Firebase.auth.currentUser?.uid ?: "" // 현재 사용자의 아이디
 
                 snapshot.children.forEach {
                     val user = it.getValue(User::class.java)
                     user ?: return
 
-                    if(user.id != Firebase.auth.currentUser!!.uid) {
-                        userList.add(user)
+                    if(user.id != currentUserId) { // 현재 사용자 계정이 아닌 경우에만
+                        userList.add(user) // 화면에 보여준다.
                     }
                 }
 
