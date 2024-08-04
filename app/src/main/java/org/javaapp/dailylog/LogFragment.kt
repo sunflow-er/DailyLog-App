@@ -8,6 +8,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.FragmentLogBinding
 import org.javaapp.dailylog.databinding.ItemLogPostBinding
 import java.text.SimpleDateFormat
@@ -39,6 +41,7 @@ class LogFragment : Fragment() {
     private inner class PostHolder(private val binding : ItemLogPostBinding) : RecyclerView.ViewHolder(binding.root) {
         val dateFormat = SimpleDateFormat("yyyy.MM.dd (E)", Locale.getDefault()) // 날짜 포맷
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // 시간 포맷
+
         fun bind(post : Post) {
             binding.userProfileImage.setImageResource(post.user?.profileImage ?: R.drawable.baseline_account_box_24) // 프로필 이미지
             binding.userNameText.setText(post.user?.name ?: "알 수 없음") // 사용자 이름
@@ -71,11 +74,11 @@ class LogFragment : Fragment() {
         }
 
         override fun getItemCount(): Int {
-            TODO("Not yet implemented")
+            return postList.size
         }
 
         override fun onBindViewHolder(holder: PostHolder, position: Int) {
-            TODO("Not yet implemented")
+            holder.bind(postList[position])
         }
 
     }
