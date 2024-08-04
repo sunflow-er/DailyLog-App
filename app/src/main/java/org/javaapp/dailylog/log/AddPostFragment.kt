@@ -5,16 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import org.javaapp.dailylog.databinding.FragmentEditPostBinding
+import org.javaapp.dailylog.databinding.FragmentAddPostBinding
 
-class EditPostFragment : Fragment() {
-    private lateinit var binding : FragmentEditPostBinding
+class AddPostFragment : Fragment() {
+    private lateinit var binding : FragmentAddPostBinding
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FragmentEditPostBinding.inflate(inflater, container, false)
+        binding = FragmentAddPostBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -27,7 +27,7 @@ class EditPostFragment : Fragment() {
         }
 
         binding.postButton.setOnClickListener {
-
+            // TODO 업로드 하기
         }
     }
 }

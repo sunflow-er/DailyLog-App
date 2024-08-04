@@ -8,11 +8,13 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.ActivityMainBinding
+import org.javaapp.dailylog.log.AddPostFragment
 import org.javaapp.dailylog.log.LogFragment
+import org.javaapp.dailylog.log.Post
 import org.javaapp.dailylog.my.MyFragment
 import org.javaapp.dailylog.with.WithFragment
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), LogFragment.OnAddSelectedListener, LogFragment.OnPostSelectedListener {
     private lateinit var binding : ActivityMainBinding
     private lateinit var auth: FirebaseAuth // firebase auth
 
@@ -74,4 +76,17 @@ class MainActivity : AppCompatActivity() {
             finish() // 현재 액티비티 종료
         }
     }
+
+    override fun onPostSelected() {
+        // TODO("Not yet implemented")
+    }
+
+    override fun onAddSelected() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, AddPostFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+
 }

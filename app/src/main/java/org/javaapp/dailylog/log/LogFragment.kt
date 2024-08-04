@@ -1,5 +1,6 @@
 package org.javaapp.dailylog.log
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -21,7 +22,33 @@ import java.util.Locale
 
 
 class LogFragment : Fragment() {
+
+    // 프래그먼트에서 이벤트를 전달하기 위한 인터페이스 정의
+    interface OnPostSelectedListener { // 게시글이 선택되었을 때
+        fun onPostSelected()
+    }
+    interface OnAddSelectedListener { // 앱바 메뉴의 게시
+        // 글 추가 버튼이 선택되었을 때
+        fun onAddSelected()
+    }
+
     private lateinit var binding : FragmentLogBinding
+    private var onPostSelectedListener : OnPostSelectedListener? = null
+    private var onAddSelectedListener : OnAddSelectedListener? = null
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        onAddSelectedListener = context as OnAddSelectedListener
+        onPostSelectedListener = context as OnPostSelectedListener
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,26 +63,26 @@ class LogFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 앱바 메뉴 리스너 설정
         val menuHost : MenuHost = requireActivity() // 메뉴를 관리하는 호스트
-        menuHost.addMenuProvider(object : MenuProvider { // 메뉴호스트에 메뉴프로바이더 추가, 메뉴 생성 및 항목 선택 처리
-            
+        val menuProvider = object : MenuProvider { // 메뉴호스트에 메뉴프로바이더 추가, 메뉴 생성 및 항목 선택 처리
+
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) { // 메뉴 생성 시 호출
                 menuInflater.inflate(R.menu.menu_log, menu)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean { // 메뉴 아이템 선택 시 호출
                 return when (menuItem.itemId) {
-                    R.id.new_post -> {
-                        // 이벤트 처리
+                    R.id.add_post -> {
+                        onAddSelectedListener?.onAddSelected()
                         true
                     }
                     else -> false
                 }
             }
 
-        })
-        
-        
+        }
+        menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
         binding.postRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -63,11 +90,20 @@ class LogFragment : Fragment() {
         }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        onAddSelectedListener = null
+        onPostSelectedListener = null
+    }
+
     private inner class PostHolder(private val binding : ItemLogPostBinding) : RecyclerView.ViewHolder(binding.root) {
-        val dateFormat = SimpleDateFormat("yyyy.MM.dd (E)", Locale.getDefault()) // 날짜 포맷
-        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // 시간 포맷
+
+        private val dateFormat = SimpleDateFormat("yyyy.MM.dd (E)", Locale.getDefault()) // 날짜 포맷
+        private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // 시간 포맷
+
 
         fun bind(post : Post) {
+
             binding.userProfileImage.setImageResource(post.user?.profileImage ?: R.drawable.baseline_account_box_24) // 프로필 이미지
             binding.userNameText.setText(post.user?.name ?: "알 수 없음") // 사용자 이름
             binding.postDateText.setText(dateFormat.format(post.date)) // 게시 날짜
@@ -88,7 +124,9 @@ class LogFragment : Fragment() {
                     isVisible = true
                 }
             }
+
         }
+
     }
 
     private inner class PostAdpater(private val postList : List<Post>) : RecyclerView.Adapter<PostHolder>() {

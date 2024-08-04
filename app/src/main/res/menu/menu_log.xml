@@ -3,9 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/new_post"
+        android:id="@+id/add_post"
         android:icon="@drawable/baseline_add_24"
         android:title="새로운 글"
         app:showAsAction="ifRoom|withText"
         />
+
 </menu>
