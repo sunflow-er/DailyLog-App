@@ -2,18 +2,15 @@ package org.javaapp.dailylog
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.ActivityMainBinding
-import kotlin.math.log
+import org.javaapp.dailylog.log.LogFragment
+import org.javaapp.dailylog.my.MyFragment
+import org.javaapp.dailylog.with.WithFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding

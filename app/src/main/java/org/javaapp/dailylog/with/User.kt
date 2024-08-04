@@ -1,4 +1,4 @@
-package org.javaapp.dailylog
+package org.javaapp.dailylog.with
 
 data class User(
     val id : String? = null,

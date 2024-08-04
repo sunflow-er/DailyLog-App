@@ -1,5 +1,6 @@
-package org.javaapp.dailylog
+package org.javaapp.dailylog.log
 
+import org.javaapp.dailylog.with.User
 import java.util.Date
 
 data class Post(

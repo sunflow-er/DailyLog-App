@@ -1,4 +1,4 @@
-package org.javaapp.dailylog
+package org.javaapp.dailylog.with
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.javaapp.dailylog.Key
+import org.javaapp.dailylog.R
 import org.javaapp.dailylog.databinding.FragmentWithBinding
 import org.javaapp.dailylog.databinding.ItemWithUserBinding
 

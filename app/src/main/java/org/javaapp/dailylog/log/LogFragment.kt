@@ -1,15 +1,19 @@
-package org.javaapp.dailylog
+package org.javaapp.dailylog.log
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import org.javaapp.dailylog.R
 import org.javaapp.dailylog.databinding.FragmentLogBinding
 import org.javaapp.dailylog.databinding.ItemLogPostBinding
 import java.text.SimpleDateFormat
@@ -31,6 +35,27 @@ class LogFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val menuHost : MenuHost = requireActivity() // 메뉴를 관리하는 호스트
+        menuHost.addMenuProvider(object : MenuProvider { // 메뉴호스트에 메뉴프로바이더 추가, 메뉴 생성 및 항목 선택 처리
+            
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) { // 메뉴 생성 시 호출
+                menuInflater.inflate(R.menu.menu_log, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean { // 메뉴 아이템 선택 시 호출
+                return when (menuItem.itemId) {
+                    R.id.new_post -> {
+                        // 이벤트 처리
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+        })
+        
+        
 
         binding.postRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
