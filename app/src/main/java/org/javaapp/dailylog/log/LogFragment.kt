@@ -14,18 +14,24 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.databinding.FragmentLogBinding
 import org.javaapp.dailylog.databinding.ItemLogBinding
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 
 class LogFragment : Fragment() {
 
     // 프래그먼트에서 이벤트를 전달하기 위한 리스너 인터페이스 정의
-    interface OnPostSelectedListener { // 게시글이 선택되었을 때
-        fun onPostSelected()
+    interface OnLogSelectedListener { // 게시글이 선택되었을 때
+        fun onLogSelected()
     }
     interface OnAddSelectedListener { // 앱바 메뉴의 게시
         // 글 추가 버튼이 선택되었을 때
@@ -33,15 +39,21 @@ class LogFragment : Fragment() {
     }
 
     private lateinit var binding : FragmentLogBinding
-    private var onPostSelectedListener : OnPostSelectedListener? = null
+    private lateinit var currentUser : FirebaseUser
+    private var onLogSelectedListener : OnLogSelectedListener? = null
     private var onAddSelectedListener : OnAddSelectedListener? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        currentUser = Firebase.auth.currentUser!!
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         onAddSelectedListener = context as OnAddSelectedListener
-        onPostSelectedListener = context as OnPostSelectedListener
+        onLogSelectedListener = context as OnLogSelectedListener
     }
 
     override fun onCreateView(
@@ -78,35 +90,56 @@ class LogFragment : Fragment() {
         }
         menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
+        // 리사이클러뷰 설정
         binding.logRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = PostAdpater(emptyList())
+            adapter = LogAdapter(emptyList())
         }
+
+        // 파이어베이스 데이터베이스에서 로그 정보 가져오기 (업데이트 될때마다)
+        Firebase.database.reference.child(Key.DB_LOGS).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val logList = mutableListOf<Log>()
+
+                snapshot.children.forEach {
+                    val log = it.getValue(Log::class.java)
+                    log ?: return
+
+                    if (log.userId != currentUser.uid) {
+                        logList.add(log)
+                    }
+                }
+
+                binding.logRecyclerView.adapter = LogAdapter(logList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // TODO
+            }
+
+        })
+
+
     }
 
     override fun onDetach() {
         super.onDetach()
         onAddSelectedListener = null
-        onPostSelectedListener = null
+        onLogSelectedListener = null
     }
 
-    private inner class PostHolder(private val binding : ItemLogBinding) : RecyclerView.ViewHolder(binding.root) {
-
-        private val dateFormat = SimpleDateFormat("yyyy.MM.dd (E)", Locale.getDefault()) // 날짜 포맷
-        private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // 시간 포맷
-
+    private inner class LogHolder(private val binding : ItemLogBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(log : Log) {
-
-            binding.logUserProfileImage.setImageResource(log.user?.profileImage ?: R.drawable.baseline_account_box_24) // 프로필 이미지
-            binding.logUserNameText.setText(log.user?.name ?: "알 수 없음") // 사용자 이름
-            binding.logDateText.setText(dateFormat.format(log.date)) // 게시 날짜
-            binding.logTimeText.setText(timeFormat.format(log.date)) // 게시 시간
-            if (log.image == null) { // 사진을 첨부하지 않았으면
+            binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24) // 프로필 이미지
+            binding.logUserNameText.setText(log.userId ?: "알 수 없음") // 사용자 이름
+            binding.logDateText.setText(log.date) // 게시 날짜
+            binding.logTimeText.setText(log.date) // 게시 시간
+            if (log.image.isNullOrBlank()) { // 사진을 첨부하지 않았으면
                 binding.logContentImage.isVisible = false // 보이지 않게
             } else { // 첨부했으면
                 binding.logContentImage.apply {
-                    setImageResource(log.image) // 보이게
+                    setImageResource(R.drawable.baseline_image_48) // 보이게
                     isVisible = true
                 }
             }
@@ -119,22 +152,30 @@ class LogFragment : Fragment() {
                 }
             }
 
+            binding.logLikeButton.setOnClickListener {
+                // TODO likeCount++
+            }
+
+            binding.logCommentButton.setOnClickListener {
+                onLogSelectedListener?.onLogSelected()
+            }
+
         }
 
     }
 
-    private inner class PostAdpater(private val logList : List<Log>) : RecyclerView.Adapter<PostHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostHolder {
+    private inner class LogAdapter(private val logList : List<Log>) : RecyclerView.Adapter<LogHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogHolder {
             val binding = ItemLogBinding.inflate(layoutInflater, parent, false)
 
-            return PostHolder(binding)
+            return LogHolder(binding)
         }
 
         override fun getItemCount(): Int {
             return logList.size
         }
 
-        override fun onBindViewHolder(holder: PostHolder, position: Int) {
+        override fun onBindViewHolder(holder: LogHolder, position: Int) {
             holder.bind(logList[position])
         }
 

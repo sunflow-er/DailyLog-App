@@ -64,7 +64,7 @@ class UserFragment : Fragment() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-
+                // TODO
             }
         })
     }

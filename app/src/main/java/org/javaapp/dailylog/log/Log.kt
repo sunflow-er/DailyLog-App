@@ -5,10 +5,10 @@ import java.util.Date
 
 data class Log(
     val postId : String? = null,
-    val user : User? = null,
-    val date : Date? = null,
+    val userId : String? = null,
+    val date : String? = null,
     val text : String?= null,
-    val image : Int? = null,
+    val image : String? = null,
     val likeCount : Int? = null,
     val commentCount : Int? = null,
 )
