@@ -1,4 +1,4 @@
-package org.javaapp.dailylog.with
+package org.javaapp.dailylog.user
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,11 +15,12 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.R
-import org.javaapp.dailylog.databinding.FragmentWithBinding
-import org.javaapp.dailylog.databinding.ItemWithUserBinding
+import org.javaapp.dailylog.databinding.FragmentUserBinding
+import org.javaapp.dailylog.databinding.ItemUserBinding
 
-class WithFragment : Fragment() {
-    private lateinit var binding: FragmentWithBinding
+
+class UserFragment : Fragment() {
+    private lateinit var binding: FragmentUserBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +31,7 @@ class WithFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentWithBinding.inflate(inflater,container, false)
+        binding = FragmentUserBinding.inflate(inflater,container, false)
 
         return binding.root
     }
@@ -68,7 +69,7 @@ class WithFragment : Fragment() {
         })
     }
 
-    private inner class UserHolder(private val binding: ItemWithUserBinding) : RecyclerView.ViewHolder(binding.root) {
+    private inner class UserHolder(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(user : User) {
             binding.userProfileImage.setImageResource(user.profileImage ?: R.drawable.baseline_account_box_24)
@@ -79,7 +80,7 @@ class WithFragment : Fragment() {
 
     private inner class UserAdapter(private val userList : List<User>) : RecyclerView.Adapter<UserHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserHolder {
-            val binding = ItemWithUserBinding.inflate(layoutInflater, parent, false)
+            val binding = ItemUserBinding.inflate(layoutInflater, parent, false)
 
             return UserHolder(binding)
         }
@@ -95,8 +96,8 @@ class WithFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance() : WithFragment {
-            return WithFragment()
+        fun newInstance() : UserFragment {
+            return UserFragment()
         }
     }
 }

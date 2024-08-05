@@ -28,8 +28,8 @@ class SignUpActivity : AppCompatActivity() {
         auth = Firebase.auth
 
         binding.signUpButton.setOnClickListener {
-            val name = binding.nameEditText.text.toString()
-            val email = binding.emailEditText.text.toString()
+            val name = binding.nameEdit.text.toString()
+            val email = binding.emailEdit.text.toString()
             val password = binding.pwEditText.text.toString()
 
             if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {

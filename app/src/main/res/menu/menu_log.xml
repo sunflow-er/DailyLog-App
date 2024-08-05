@@ -3,8 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/add_post"
+        android:id="@+id/add_log"
         android:icon="@drawable/baseline_add_24"
+        android:iconTint="@color/white"
+        android:iconTintMode="src_in"
         android:title="새로운 글"
         app:showAsAction="ifRoom|withText"
         />

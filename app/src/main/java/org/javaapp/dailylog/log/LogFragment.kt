@@ -16,14 +16,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.databinding.FragmentLogBinding
-import org.javaapp.dailylog.databinding.ItemLogPostBinding
+import org.javaapp.dailylog.databinding.ItemLogBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 
 class LogFragment : Fragment() {
 
-    // 프래그먼트에서 이벤트를 전달하기 위한 인터페이스 정의
+    // 프래그먼트에서 이벤트를 전달하기 위한 리스너 인터페이스 정의
     interface OnPostSelectedListener { // 게시글이 선택되었을 때
         fun onPostSelected()
     }
@@ -42,12 +42,6 @@ class LogFragment : Fragment() {
 
         onAddSelectedListener = context as OnAddSelectedListener
         onPostSelectedListener = context as OnPostSelectedListener
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
     }
 
     override fun onCreateView(
@@ -73,8 +67,8 @@ class LogFragment : Fragment() {
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean { // 메뉴 아이템 선택 시 호출
                 return when (menuItem.itemId) {
-                    R.id.add_post -> {
-                        onAddSelectedListener?.onAddSelected()
+                    R.id.add_log -> {
+                        onAddSelectedListener?.onAddSelected() // 새 게시글 작성 프래그먼트로 이동
                         true
                     }
                     else -> false
@@ -84,7 +78,7 @@ class LogFragment : Fragment() {
         }
         menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
-        binding.postRecyclerView.apply {
+        binding.logRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = PostAdpater(emptyList())
         }
@@ -96,31 +90,31 @@ class LogFragment : Fragment() {
         onPostSelectedListener = null
     }
 
-    private inner class PostHolder(private val binding : ItemLogPostBinding) : RecyclerView.ViewHolder(binding.root) {
+    private inner class PostHolder(private val binding : ItemLogBinding) : RecyclerView.ViewHolder(binding.root) {
 
         private val dateFormat = SimpleDateFormat("yyyy.MM.dd (E)", Locale.getDefault()) // 날짜 포맷
         private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // 시간 포맷
 
 
-        fun bind(post : Post) {
+        fun bind(log : Log) {
 
-            binding.userProfileImage.setImageResource(post.user?.profileImage ?: R.drawable.baseline_account_box_24) // 프로필 이미지
-            binding.userNameText.setText(post.user?.name ?: "알 수 없음") // 사용자 이름
-            binding.postDateText.setText(dateFormat.format(post.date)) // 게시 날짜
-            binding.postTimeText.setText(timeFormat.format(post.date)) // 게시 시간
-            if (post.image == null) { // 사진을 첨부하지 않았으면
-                binding.postImage.isVisible = false // 보이지 않게
+            binding.logUserProfileImage.setImageResource(log.user?.profileImage ?: R.drawable.baseline_account_box_24) // 프로필 이미지
+            binding.logUserNameText.setText(log.user?.name ?: "알 수 없음") // 사용자 이름
+            binding.logDateText.setText(dateFormat.format(log.date)) // 게시 날짜
+            binding.logTimeText.setText(timeFormat.format(log.date)) // 게시 시간
+            if (log.image == null) { // 사진을 첨부하지 않았으면
+                binding.logContentImage.isVisible = false // 보이지 않게
             } else { // 첨부했으면
-                binding.postImage.apply {
-                    setImageResource(post.image) // 보이게
+                binding.logContentImage.apply {
+                    setImageResource(log.image) // 보이게
                     isVisible = true
                 }
             }
-            if (post.text.isNullOrBlank()) { // 글을 작성하지 않았으면
-                binding.postText.isVisible = false // 보이지 않게
+            if (log.text.isNullOrBlank()) { // 글을 작성하지 않았으면
+                binding.logContentText.isVisible = false // 보이지 않게
             } else { // 작성했다면
-                binding.postText.apply {
-                    setText(post.text) // 보이게
+                binding.logContentText.apply {
+                    setText(log.text) // 보이게
                     isVisible = true
                 }
             }
@@ -129,19 +123,19 @@ class LogFragment : Fragment() {
 
     }
 
-    private inner class PostAdpater(private val postList : List<Post>) : RecyclerView.Adapter<PostHolder>() {
+    private inner class PostAdpater(private val logList : List<Log>) : RecyclerView.Adapter<PostHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostHolder {
-            val binding = ItemLogPostBinding.inflate(layoutInflater, parent, false)
+            val binding = ItemLogBinding.inflate(layoutInflater, parent, false)
 
             return PostHolder(binding)
         }
 
         override fun getItemCount(): Int {
-            return postList.size
+            return logList.size
         }
 
         override fun onBindViewHolder(holder: PostHolder, position: Int) {
-            holder.bind(postList[position])
+            holder.bind(logList[position])
         }
 
     }

@@ -15,7 +15,7 @@
         />
 
     <EditText
-        android:id="@+id/email_edit_text"
+        android:id="@+id/email_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="32sp"
@@ -25,7 +25,7 @@
         />
 
     <EditText
-        android:id="@+id/pw_edit_text"
+        android:id="@+id/pw_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="32sp"

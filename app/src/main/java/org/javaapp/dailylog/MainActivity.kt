@@ -8,17 +8,16 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.ActivityMainBinding
-import org.javaapp.dailylog.log.AddPostFragment
+import org.javaapp.dailylog.log.AddLogFragment
 import org.javaapp.dailylog.log.LogFragment
-import org.javaapp.dailylog.log.Post
 import org.javaapp.dailylog.my.MyFragment
-import org.javaapp.dailylog.with.WithFragment
+import org.javaapp.dailylog.user.UserFragment
 
 class MainActivity : AppCompatActivity(), LogFragment.OnAddSelectedListener, LogFragment.OnPostSelectedListener {
     private lateinit var binding : ActivityMainBinding
     private lateinit var auth: FirebaseAuth // firebase auth
 
-    private lateinit var withFragment: WithFragment
+    private lateinit var userFragment: UserFragment
     private lateinit var logFragment: LogFragment
     private lateinit var myFragment: MyFragment
 
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity(), LogFragment.OnAddSelectedListener, Log
         auth = Firebase.auth // FirebaseAuth 객체의 공유 인스턴스 가져오기
 
         // 프래그먼트 객체 초기화(생성)
-        withFragment = WithFragment.newInstance()
+        userFragment = UserFragment.newInstance()
         logFragment = LogFragment.newInstance()
         myFragment = MyFragment.newInstance()
 
@@ -38,15 +37,15 @@ class MainActivity : AppCompatActivity(), LogFragment.OnAddSelectedListener, Log
         // 설정)
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) // 현재 프래그먼트 정보 가져오기
         if (currentFragment == null) { // 현재 프래그먼트가 없다면
-            val baseFragment = withFragment // WithFragment를 기본 프래그먼트로 설정
+            val baseFragment = userFragment // WithFragment를 기본 프래그먼트로 설정
             supportFragmentManager.beginTransaction().add(R.id.fragment_container, baseFragment).commit() // 기본 프래그먼트 띄우기
         }
 
         // 바텀 내비게이션 뷰 리스너 설정
         binding.bottomNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.fragment_with -> {
-                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container, withFragment).commit()
+                R.id.fragment_user -> {
+                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container, userFragment).commit()
                     true
                 }
                 R.id.fragment_log -> {
@@ -83,7 +82,7 @@ class MainActivity : AppCompatActivity(), LogFragment.OnAddSelectedListener, Log
 
     override fun onAddSelected() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, AddPostFragment())
+            .replace(R.id.fragment_container, AddLogFragment())
             .addToBackStack(null)
             .commit()
     }

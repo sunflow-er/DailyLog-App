@@ -37,8 +37,8 @@ class SignInActivity : AppCompatActivity() {
 
         // 로그인 버튼 리스너 설정
         binding.signInButton.setOnClickListener {
-            val email = binding.emailEditText.text.toString()
-            val password = binding.pwEditText.text.toString()
+            val email = binding.emailEdit.text.toString()
+            val password = binding.pwEdit.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 signIn(email, password)
@@ -60,8 +60,8 @@ class SignInActivity : AppCompatActivity() {
         val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result : ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
                 // 회원가입 시에 입력한 이메일, 비밀번호 정보를 로그인 화면에 그대로 가져오기
-                binding.emailEditText.setText(result.data?.getStringExtra(EMAIL_KEY))
-                binding.pwEditText.setText(result.data?.getStringExtra(PASSWORD_KEY))
+                binding.emailEdit.setText(result.data?.getStringExtra(EMAIL_KEY))
+                binding.pwEdit.setText(result.data?.getStringExtra(PASSWORD_KEY))
             }
         }
 
