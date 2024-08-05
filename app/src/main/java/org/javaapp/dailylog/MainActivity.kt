@@ -9,6 +9,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.ActivityMainBinding
 import org.javaapp.dailylog.log.AddLogFragment
+import org.javaapp.dailylog.log.CommentLogFragment
 import org.javaapp.dailylog.log.LogFragment
 import org.javaapp.dailylog.my.MyFragment
 import org.javaapp.dailylog.user.UserFragment
@@ -77,7 +78,10 @@ class MainActivity : AppCompatActivity(), LogFragment.OnAddSelectedListener, Log
     }
 
     override fun onLogSelected() {
-        TODO("Not yet implemented")
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, CommentLogFragment())
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onAddSelected() {

@@ -40,7 +40,7 @@ class CommentLogFragment : Fragment() {
 
         binding.commentRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = CommentAdapter()
+            adapter = CommentAdapter(commentList)
         }
     }
 
