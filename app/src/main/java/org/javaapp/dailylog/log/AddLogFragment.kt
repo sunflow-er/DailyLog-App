@@ -21,9 +21,8 @@ import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.databinding.FragmentAddLogBinding
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import org.javaapp.dailylog.formatDateTimeNow
+import org.javaapp.dailylog.formatText
 import java.util.UUID
 
 class AddLogFragment : Fragment() {
@@ -87,7 +86,7 @@ class AddLogFragment : Fragment() {
             log["userId"] = currentUser.uid
             log["date"] = date
             log["time"] = time
-            log["text"] = binding.addTextEdit.text.toString()
+            log["text"] = formatText(binding.addTextEdit.text.toString())
             log["image"] = ""
             log["likeCount"] = 0
             log["commentCount"] = 0
@@ -103,19 +102,6 @@ class AddLogFragment : Fragment() {
         }
     }
 
-    private fun formatDateTimeNow() : Pair<String, String> {
-        // 현재 날짜 및 시간
-        val dateTimeNow = LocalDateTime.now()
 
-        // 날짜 포맷팅
-        val dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd (E)", Locale.KOREAN)
-        val formattedDate = dateTimeNow.format(dateFormatter)
-
-        // 시간 포맷팅
-        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-        val formattedTime = dateTimeNow.format(timeFormatter)
-
-        return Pair(formattedDate, formattedTime)
-    }
     
 }
