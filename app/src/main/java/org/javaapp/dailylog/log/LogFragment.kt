@@ -110,7 +110,7 @@ class LogFragment : Fragment() {
                 snapshot.children.forEach {
                     val log = it.getValue(Log::class.java)
                     log ?: return
-                    
+
                     logList.add(log)
                 }
 
@@ -134,22 +134,9 @@ class LogFragment : Fragment() {
 
     private inner class LogHolder(private val binding: ItemLogBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.root.setOnClickListener {
-                onLogSelectedListener?.onLogSelected()
-            }
-
-            binding.logLikeButton.setOnClickListener {
-                // TODO likeCount++
-            }
-
-            binding.logCommentButton.setOnClickListener {
-                onLogSelectedListener?.onLogSelected()
-            }
-        }
-
 
         fun bind(log: Log) {
+            // 바인딩
             binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24) // 프로필 이미지
             binding.logUserNameText.setText(getUserName(log)) // 사용자 이름
             binding.logDateText.setText(log.date) // 게시 날짜
@@ -169,6 +156,21 @@ class LogFragment : Fragment() {
                     setText(log.text) // 보이게
                     isVisible = true
                 }
+            }
+            
+            // 이벤트 리스너 설정
+            binding.root.setOnClickListener {// 로그 화면(전체) 클릭 시
+                onLogSelectedListener?.onLogSelected() // CommentLogFragment로 이동
+            }
+
+            binding.logLikeButton.setOnClickListener {// 하트 버튼 클릭 시
+                log.likeCount = log.likeCount?.plus(1) ?: 0 // likeCount++
+
+                binding.logLikeButton.setImageResource(R.drawable.baseline_favorite_24) // 채워진 하트 이미지로 변경
+            }
+
+            binding.logCommentButton.setOnClickListener {// 댓글 버튼 클릭 시
+                onLogSelectedListener?.onLogSelected() // CommentLogFragment로 이동
             }
 
         }
@@ -199,6 +201,7 @@ class LogFragment : Fragment() {
         }
     }
 
+    // 사용자 id에 해당하는 이름 가져오기
     private fun getUserName(log: Log): String? {
         var userName: String? = null
 

@@ -7,6 +7,6 @@ data class Log(
     val time : String? = null,
     val text : String?= null,
     val image : String? = null,
-    val likeCount : Int? = null,
-    val commentCount : Int? = null,
+    var likeCount : Int? = null,
+    var commentCount : Int? = null,
 )
