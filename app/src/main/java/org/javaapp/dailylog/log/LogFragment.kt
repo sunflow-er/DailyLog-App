@@ -148,7 +148,8 @@ class LogFragment : Fragment() {
             binding.logDateText.setText(log.date) // 게시 날짜
             binding.logTimeText.setText(log.time) // 게시 시간
             if (log.image.isNullOrBlank()) { // 사진을 첨부하지 않았으면
-                binding.logContentImage.isVisible = false // 보이지 않게
+                binding.logContentImage.setImageResource(R.drawable.baseline_home_filled_100)
+               //  binding.logContentImage.isVisible = false // 보이지 않게
             } else { // 첨부했으면
                 binding.logContentImage.apply {
                     setImageResource(R.drawable.baseline_image_48) // 보이게
