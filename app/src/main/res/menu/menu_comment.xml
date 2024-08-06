@@ -8,5 +8,6 @@
         android:iconTint="@color/white"
         android:iconTintMode="src_in"
         android:title="뒤로 가기"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom|withText"
+        />
 </menu>

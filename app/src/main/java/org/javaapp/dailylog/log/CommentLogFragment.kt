@@ -59,8 +59,8 @@ class CommentLogFragment : Fragment() {
                     else -> false
                 }
             }
-
         }
+        menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
         binding.commentRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
