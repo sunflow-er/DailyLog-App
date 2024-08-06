@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/back_to_log"
+        android:icon="@drawable/baseline_arrow_back_24"
+        android:iconTint="@color/white"
+        android:iconTintMode="src_in"
+        android:title="뒤로 가기"
+        app:showAsAction="ifRoom|withText"
+        />
+
+</menu>
