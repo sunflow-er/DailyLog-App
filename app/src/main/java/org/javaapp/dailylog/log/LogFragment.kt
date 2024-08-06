@@ -129,6 +129,20 @@ class LogFragment : Fragment() {
     }
 
     private inner class LogHolder(private val binding : ItemLogBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.root.setOnClickListener {
+                onLogSelectedListener?.onLogSelected()
+            }
+
+            binding.logLikeButton.setOnClickListener {
+                // TODO likeCount++
+            }
+
+            binding.logCommentButton.setOnClickListener {
+                onLogSelectedListener?.onLogSelected()
+            }
+        }
+
 
         fun bind(log : Log) {
             binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24) // 프로필 이미지
@@ -150,14 +164,6 @@ class LogFragment : Fragment() {
                     setText(log.text) // 보이게
                     isVisible = true
                 }
-            }
-
-            binding.logLikeButton.setOnClickListener {
-                // TODO likeCount++
-            }
-
-            binding.logCommentButton.setOnClickListener {
-                onLogSelectedListener?.onLogSelected()
             }
 
         }

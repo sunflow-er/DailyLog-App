@@ -35,6 +35,11 @@ class CommentLogFragment : Fragment() {
         commentList = mutableListOf<Comment>()
         commentList.add(Comment("1", "hello"))
         commentList.add(Comment("2", "hellohellohellohellohellohellohellohellohellohellohello"))
+        commentList.add(Comment("3", "hellohellohellohellohellohellohellohellohellohellohello"))
+        commentList.add(Comment("4", "hellohellohellohellohellohellohellohellohellohellohello"))
+        commentList.add(Comment("5", "hellohellohellohellohellohellohellohellohellohellohello"))
+        commentList.add(Comment("6", "hellohellohellohellohellohellohellohellohellohellohello"))
+        commentList.add(Comment("7", "hellohellohellohellohellohellohellohellohellohellohello"))
 
 
         return binding.root
@@ -63,7 +68,7 @@ class CommentLogFragment : Fragment() {
         menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
         binding.commentRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = NonScrollableLinearLayoutManager(context)
             adapter = CommentAdapter(commentList)
         }
     }
