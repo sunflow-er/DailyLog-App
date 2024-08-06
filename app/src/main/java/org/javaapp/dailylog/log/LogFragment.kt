@@ -69,7 +69,7 @@ class LogFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 앱바 메뉴 리스너 설정
+        // 앱바 메뉴 인플레이트 및 리스너 설정
         val menuHost : MenuHost = requireActivity() // 메뉴를 관리하는 호스트
         val menuProvider = object : MenuProvider { // 메뉴호스트에 메뉴프로바이더 추가, 메뉴 생성 및 항목 선택 처리
 
