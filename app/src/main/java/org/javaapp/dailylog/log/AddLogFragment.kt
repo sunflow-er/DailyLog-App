@@ -15,22 +15,26 @@ import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.databinding.FragmentAddLogBinding
 import java.time.LocalDateTime
+import java.util.UUID
 
 class AddLogFragment : Fragment() {
 
     private lateinit var binding : FragmentAddLogBinding
-    private lateinit var currentUser : FirebaseUser
+    private lateinit var currentUser : FirebaseUser // user
+    private lateinit var database : DatabaseReference // database
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         currentUser = Firebase.auth.currentUser!!
+        database = Firebase.database(Key.DB_URL).reference
     }
 
     override fun onCreateView(
@@ -73,8 +77,10 @@ class AddLogFragment : Fragment() {
         binding.addButton.setOnClickListener {
 
             // 저장할 로그 정보
+            val logId = UUID.randomUUID().toString()
+
             val log = mutableMapOf<String, Any>()
-            log["id"] = "" // logId
+            log["id"] = logId
             log["userId"] = currentUser.uid
             log["date"] = LocalDateTime.now().toString()
             log["text"] = binding.addTextEdit.text.toString()
@@ -83,9 +89,9 @@ class AddLogFragment : Fragment() {
             log["commentCount"] = 0
 
             // 파이어베이스 데이터베이스에 로그 정보 저장
-            Firebase.database(Key.DB_URL).reference
+            database
                 .child(Key.DB_LOGS)
-                .push()
+                .child(logId)
                 .setValue(log)
 
             // 프래그먼트 종료

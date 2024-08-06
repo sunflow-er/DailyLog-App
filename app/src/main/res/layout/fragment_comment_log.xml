@@ -127,7 +127,7 @@
         android:layout_width="296dp"
         android:layout_height="40dp"
         android:inputType="text"
-        android:hint="comment"
+        tools:hint="comment"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/line_3"
         android:textSize="16sp"

@@ -42,7 +42,8 @@
             android:hint="content"
             android:inputType="textMultiLine"
             android:padding="8dp"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            />
 
     </LinearLayout>
 
