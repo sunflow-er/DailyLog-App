@@ -51,6 +51,7 @@ class SignUpActivity : AppCompatActivity() {
                 user["id"] = currentUser.uid
                 user["name"] = name
                 user["statusMessage"] = ""
+                user["profileImage"] = ""
 
                 Firebase.database(Key.DB_URL).reference // 파이어베이스 데이터베이스에 사용자 정보를 업데이트
                     .child(Key.DB_USERS)

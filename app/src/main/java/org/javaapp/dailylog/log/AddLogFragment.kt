@@ -74,6 +74,7 @@ class AddLogFragment : Fragment() {
 
             // 저장할 로그 정보
             val log = mutableMapOf<String, Any>()
+            log["id"] = "" // logId
             log["userId"] = currentUser.uid
             log["date"] = LocalDateTime.now().toString()
             log["text"] = binding.addTextEdit.text.toString()

@@ -1,10 +1,7 @@
 package org.javaapp.dailylog.log
 
-import org.javaapp.dailylog.user.User
-import java.util.Date
-
 data class Log(
-    val postId : String? = null,
+    val id : String? = null,
     val userId : String? = null,
     val date : String? = null,
     val text : String?= null,
