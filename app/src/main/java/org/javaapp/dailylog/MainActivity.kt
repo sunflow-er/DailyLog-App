@@ -77,9 +77,9 @@ class MainActivity : AppCompatActivity(), LogFragment.OnAddSelectedListener, Log
         }
     }
 
-    override fun onLogSelected() {
+    override fun onLogSelected(logId : String?) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, CommentLogFragment())
+            .replace(R.id.fragment_container, CommentLogFragment(logId))
             .addToBackStack(null)
             .commit()
     }

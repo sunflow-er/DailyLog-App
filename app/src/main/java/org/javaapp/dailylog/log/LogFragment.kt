@@ -24,19 +24,18 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.R
+import org.javaapp.dailylog.UserNameCallback
 import org.javaapp.dailylog.databinding.FragmentLogBinding
 import org.javaapp.dailylog.databinding.ItemLogBinding
+import org.javaapp.dailylog.getUserName
 
 
 class LogFragment : Fragment() {
-    // 파이어베이스 데이터베이스로부터 사용자 이름(name)을 비동기적으로 가져오고 UI에 반영하기 위한 콜백 인터페이스
-    interface UserNameCallback {
-        fun onUserNameRetrieved(userName : String?)
-    }
+
 
     // 프래그먼트에서 이벤트를 전달하기 위한 리스너 인터페이스 정의
     interface OnLogSelectedListener { // 게시글이 선택되었을 때
-        fun onLogSelected()
+        fun onLogSelected(logId : String?)
     }
     interface OnAddSelectedListener { // 앱바 메뉴의 게시
         // 글 추가 버튼이 선택되었을 때
@@ -141,7 +140,7 @@ class LogFragment : Fragment() {
         fun bind(log: Log) {
             // 바인딩
             binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24) // 프로필 이미지
-            getUserName(log.userId!!, object : UserNameCallback { // 사용자 이름
+            getUserName(database ,log.userId!!, object : UserNameCallback { // 사용자 이름
                 override fun onUserNameRetrieved(userName: String?) {
                     binding.logUserNameText.text = userName
                 }
@@ -167,7 +166,7 @@ class LogFragment : Fragment() {
             
             // 이벤트 리스너 설정
             binding.root.setOnClickListener {// 로그 화면(전체) 클릭 시
-                onLogSelectedListener?.onLogSelected() // CommentLogFragment로 이동
+                onLogSelectedListener?.onLogSelected(log.id) // CommentLogFragment로 이동
             }
 
             binding.logLikeButton.setOnClickListener {// 하트 버튼 클릭 시
@@ -177,7 +176,7 @@ class LogFragment : Fragment() {
             }
 
             binding.logCommentButton.setOnClickListener {// 댓글 버튼 클릭 시
-                onLogSelectedListener?.onLogSelected() // CommentLogFragment로 이동
+                onLogSelectedListener?.onLogSelected(log.id) // CommentLogFragment로 이동
             }
 
         }
@@ -208,20 +207,6 @@ class LogFragment : Fragment() {
         }
     }
 
-    // 파이어베이스 데이터베이스에서 사용자 id에 해당하는 이름 가져오기
-    private fun getUserName(userId : String, callback : UserNameCallback) {
-        database.child(Key.DB_USERS).child(userId).child("name")
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val userName = snapshot.getValue(String::class.java)
-                    callback.onUserNameRetrieved(userName)
-                }
 
-                override fun onCancelled(error: DatabaseError) {
-                    callback.onUserNameRetrieved("알 수 없음")
-                }
-
-            })
-    }
 
 }

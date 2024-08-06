@@ -12,17 +12,30 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.R
+import org.javaapp.dailylog.UserNameCallback
 import org.javaapp.dailylog.databinding.FragmentCommentLogBinding
 import org.javaapp.dailylog.databinding.FragmentLogBinding
 import org.javaapp.dailylog.databinding.ItemCommentBinding
+import org.javaapp.dailylog.getUserName
 
 
-class CommentLogFragment : Fragment() {
+class CommentLogFragment(private val logId : String?) : Fragment() {
     private lateinit var binding : FragmentCommentLogBinding
+    private lateinit var database : DatabaseReference
 
-    // dummy
-    private lateinit var commentList : MutableList<Comment>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        database = Firebase.database.reference
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,17 +43,6 @@ class CommentLogFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentCommentLogBinding.inflate(layoutInflater, container, false)
-
-        // dummy
-        commentList = mutableListOf<Comment>()
-        commentList.add(Comment("1", "hello"))
-        commentList.add(Comment("2", "hellohellohellohellohellohellohellohellohellohellohello"))
-        commentList.add(Comment("3", "hellohellohellohellohellohellohellohellohellohellohello"))
-        commentList.add(Comment("4", "hellohellohellohellohellohellohellohellohellohellohello"))
-        commentList.add(Comment("5", "hellohellohellohellohellohellohellohellohellohellohello"))
-        commentList.add(Comment("6", "hellohellohellohellohellohellohellohellohellohellohello"))
-        commentList.add(Comment("7", "hellohellohellohellohellohellohellohellohellohellohello"))
-
 
         return binding.root
     }
@@ -69,8 +71,22 @@ class CommentLogFragment : Fragment() {
 
         binding.commentRecyclerView.apply {
             layoutManager = NonScrollableLinearLayoutManager(context)
-            adapter = CommentAdapter(commentList)
+            adapter = CommentAdapter(emptyList())
         }
+
+        database.child(Key.DB_LOGS).child(logId!!).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val log = snapshot.getValue(Log::class.java)
+                bindLog(log!!)
+                // bindComment()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                //
+            }
+
+        })
+
     }
 
     private inner class CommentHolder(private val binding : ItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -98,5 +114,17 @@ class CommentLogFragment : Fragment() {
 
     }
 
+    private fun bindLog(log : Log) {
+        binding.commentUserProfileImage.setImageResource(R.drawable.baseline_account_box_24)
+        getUserName(database, log.userId!!, object : UserNameCallback {
+            override fun onUserNameRetrieved(userName: String?) {
+                binding.commentUserNameText.text = userName
+            }
+        })
+        binding.commentDateText.text = log.date
+        binding.commentTimeText.text = log.time
+        binding.commentContentImage.setImageResource(R.drawable.baseline_home_filled_100)
+        binding.commentContentText.text = log.text
+    }
 
 }
