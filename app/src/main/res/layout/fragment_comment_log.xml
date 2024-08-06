@@ -1,145 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    android:padding="8dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
+        android:id="@+id/comment_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"
-        >
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/line_3">
 
-        <ImageView
-            android:id="@+id/comment_user_profile_image"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/baseline_account_box_24"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@drawable/round_rect_background"
-            />
-
-        <TextView
-            android:id="@+id/comment_user_name_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/comment_user_profile_image"
-            app:layout_constraintStart_toEndOf="@+id/comment_user_profile_image"
-            app:layout_constraintTop_toTopOf="@+id/comment_user_profile_image"
-            tools:text="user name" />
-
-        <TextView
-            android:id="@+id/comment_date_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@id/comment_time_text"
-            app:layout_constraintEnd_toEndOf="@id/comment_time_text"
-            tools:text="2024/08/01 (목)" />
-
-        <TextView
-            android:id="@+id/comment_time_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/comment_user_profile_image"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="21:52"
-            android:layout_marginEnd="4dp"/>
-
-        <View
-            android:id="@+id/line_1"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/comment_constraint_layout"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:background="#B5AAAAAA"
-            app:layout_constraintTop_toBottomOf="@id/comment_user_profile_image"
-            />
+            android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/comment_content_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/line_1"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/baseline_home_filled_100"
-            android:background="@drawable/round_rect_background"
-            />
+            <ImageView
+                android:id="@+id/comment_user_profile_image"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/round_rect_background"
+                android:src="@drawable/baseline_account_box_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/comment_content_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/comment_content_image"
-            android:layout_marginTop="8dp"
-            tools:text="my home"
-            android:padding="8dp"
-            android:textSize="16sp"
-            />
+            <TextView
+                android:id="@+id/comment_user_name_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/comment_user_profile_image"
+                app:layout_constraintStart_toEndOf="@+id/comment_user_profile_image"
+                app:layout_constraintTop_toTopOf="@+id/comment_user_profile_image"
+                tools:text="user name" />
 
-        <View
-            android:id="@+id/line_2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:background="#B5AAAAAA"
-            app:layout_constraintTop_toBottomOf="@id/comment_content_text"
-            />
+            <TextView
+                android:id="@+id/comment_date_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@id/comment_time_text"
+                app:layout_constraintEnd_toEndOf="@id/comment_time_text"
+                tools:text="2024/08/01 (목)" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/comment_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintEnd_toEndOf="@id/line_2"
-            app:layout_constraintStart_toStartOf="@id/line_2"
-            app:layout_constraintTop_toBottomOf="@id/line_2"
-            app:layout_constraintBottom_toTopOf="@id/line_3"
-            android:layout_marginBottom="8dp" />
+            <TextView
+                android:id="@+id/comment_time_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/comment_user_profile_image"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="21:52" />
 
-        <View
-            android:id="@+id/line_3"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:background="#B5AAAAAA"
-            app:layout_constraintBottom_toTopOf="@id/comment_type_edit"
-            android:layout_marginBottom="8dp"
-            />
+            <View
+                android:id="@+id/line_1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="#B5AAAAAA"
+                app:layout_constraintTop_toBottomOf="@id/comment_user_profile_image" />
 
-        <EditText
-            android:id="@+id/comment_type_edit"
-            android:layout_width="296dp"
-            android:layout_height="40dp"
-            android:inputType="text"
-            app:layout_constraintStart_toStartOf="@id/line_3"
-            app:layout_constraintBottom_toBottomOf="parent"
+            <ImageView
+                android:id="@+id/comment_content_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/round_rect_background"
+                android:src="@drawable/baseline_home_filled_100"
+                app:layout_constraintTop_toBottomOf="@id/line_1" />
 
-            />
+            <TextView
+                android:id="@+id/comment_content_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="8dp"
+                android:textSize="16sp"
+                app:layout_constraintTop_toBottomOf="@id/comment_content_image"
+                tools:text="my home" />
 
-        <ImageView
-            android:id="@+id/comment_send_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/round_rect_background"
-            android:src="@drawable/baseline_check_32"
-            app:layout_constraintBottom_toBottomOf="@id/comment_type_edit"
-            app:layout_constraintEnd_toEndOf="@id/line_3"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@id/comment_type_edit"
-            app:layout_constraintTop_toTopOf="@id/comment_type_edit"
-            app:layout_constraintVertical_bias="0.0" />
+            <View
+                android:id="@+id/line_2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="#B5AAAAAA"
+                app:layout_constraintTop_toBottomOf="@id/comment_content_text" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/comment_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="@id/comment_constraint_layout"
+                app:layout_constraintEnd_toEndOf="@id/line_2"
+                app:layout_constraintStart_toStartOf="@id/line_2"
+                app:layout_constraintTop_toBottomOf="@id/line_2" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-</ScrollView>
+    </ScrollView>
+
+    <View
+        android:id="@+id/line_3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="#B5AAAAAA"
+        app:layout_constraintBottom_toTopOf="@id/comment_type_edit" />
+
+    <EditText
+        android:id="@+id/comment_type_edit"
+        android:layout_width="296dp"
+        android:layout_height="40dp"
+        android:inputType="text"
+        android:hint="comment"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/line_3"
+        android:textSize="16sp"
+        />
+
+    <ImageView
+        android:id="@+id/comment_send_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/round_rect_background"
+        android:src="@drawable/baseline_check_32"
+        app:layout_constraintBottom_toBottomOf="@id/comment_type_edit"
+        app:layout_constraintEnd_toEndOf="@id/line_3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/comment_type_edit"
+        app:layout_constraintTop_toTopOf="@id/comment_type_edit"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
 
