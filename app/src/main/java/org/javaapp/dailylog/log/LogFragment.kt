@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -40,6 +41,8 @@ class LogFragment : Fragment() {
 
     private lateinit var binding : FragmentLogBinding
     private lateinit var currentUser : FirebaseUser
+    private lateinit var database : DatabaseReference
+
     private var onLogSelectedListener : OnLogSelectedListener? = null
     private var onAddSelectedListener : OnAddSelectedListener? = null
 
@@ -47,6 +50,7 @@ class LogFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         currentUser = Firebase.auth.currentUser!!
+        database = Firebase.database(Key.DB_URL).reference
     }
 
     override fun onAttach(context: Context) {
@@ -97,7 +101,7 @@ class LogFragment : Fragment() {
         }
 
         // 파이어베이스 데이터베이스에서 로그 정보 가져오기 (업데이트 될때마다)
-        Firebase.database.reference.child(Key.DB_LOGS).addValueEventListener(object : ValueEventListener {
+        database.child(Key.DB_LOGS).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val logList = mutableListOf<Log>()
 
@@ -105,9 +109,9 @@ class LogFragment : Fragment() {
                     val log = it.getValue(Log::class.java)
                     log ?: return
 
-                    if (log.userId != currentUser.uid) {
-                        logList.add(log)
-                    }
+//                    if (log.userId != currentUser.uid) {
+//                        logList.add(log)
+//                    }
                 }
 
                 binding.logRecyclerView.adapter = LogAdapter(logList)
@@ -145,8 +149,9 @@ class LogFragment : Fragment() {
 
 
         fun bind(log : Log) {
+
             binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24) // 프로필 이미지
-            binding.logUserNameText.setText(log.userId ?: "알 수 없음") // 사용자 이름
+            binding.logUserNameText.setText(getUserName(log)) // 사용자 이름
             binding.logDateText.setText(log.date) // 게시 날짜
             binding.logTimeText.setText(log.date) // 게시 시간
             if (log.image.isNullOrBlank()) { // 사진을 첨부하지 않았으면
@@ -191,5 +196,22 @@ class LogFragment : Fragment() {
         fun newInstance() : LogFragment {
             return LogFragment()
         }
+    }
+
+    private fun getUserName(log : Log) : String? {
+        var userName : String? = null
+
+        database.child(Key.DB_USERS).child(log.userId!!).child("name")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    userName = snapshot.getValue(String::class.java)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    userName = "알 수 없음"
+                }
+            })
+
+        return userName
     }
 }

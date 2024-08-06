@@ -22,6 +22,8 @@ import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.databinding.FragmentAddLogBinding
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.UUID
 
 class AddLogFragment : Fragment() {
@@ -76,13 +78,15 @@ class AddLogFragment : Fragment() {
         // 업로드 버튼 리스너 설정
         binding.addButton.setOnClickListener {
 
-            // 저장할 로그 정보
-            val logId = UUID.randomUUID().toString()
+            val logId = UUID.randomUUID().toString() // 로그 아이디
+            val (date, time) = formatDateTimeNow() // 포맷팅된 현재 날짜 및 시간
 
+            // 저장할 로그 정보
             val log = mutableMapOf<String, Any>()
             log["id"] = logId
             log["userId"] = currentUser.uid
-            log["date"] = LocalDateTime.now().toString()
+            log["date"] = date
+            log["time"] = time
             log["text"] = binding.addTextEdit.text.toString()
             log["image"] = ""
             log["likeCount"] = 0
@@ -99,5 +103,19 @@ class AddLogFragment : Fragment() {
         }
     }
 
+    private fun formatDateTimeNow() : Pair<String, String> {
+        // 현재 날짜 및 시간
+        val dateTimeNow = LocalDateTime.now()
+
+        // 날짜 포맷팅
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd (E)", Locale.KOREAN)
+        val formattedDate = dateTimeNow.format(dateFormatter)
+
+        // 시간 포맷팅
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        val formattedTime = dateTimeNow.format(timeFormatter)
+
+        return Pair(formattedDate, formattedTime)
+    }
     
 }
