@@ -29,12 +29,15 @@ import org.javaapp.dailylog.databinding.ItemLogBinding
 
 
 class LogFragment : Fragment() {
+    // 파이어베이스 데이터베이스로부터 사용자 이름(name)을 비동기적으로 가져오고 UI에 반영하기 위한 콜백 인터페이스
+    interface UserNameCallback {
+        fun onUserNameRetrieved(userName : String?)
+    }
 
     // 프래그먼트에서 이벤트를 전달하기 위한 리스너 인터페이스 정의
     interface OnLogSelectedListener { // 게시글이 선택되었을 때
         fun onLogSelected()
     }
-
     interface OnAddSelectedListener { // 앱바 메뉴의 게시
         // 글 추가 버튼이 선택되었을 때
         fun onAddSelected()
@@ -138,7 +141,11 @@ class LogFragment : Fragment() {
         fun bind(log: Log) {
             // 바인딩
             binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24) // 프로필 이미지
-            binding.logUserNameText.setText(getUserName(log)) // 사용자 이름
+            getUserName(log.userId!!, object : UserNameCallback { // 사용자 이름
+                override fun onUserNameRetrieved(userName: String?) {
+                    binding.logUserNameText.text = userName
+                }
+            })
             binding.logDateText.setText(log.date) // 게시 날짜
             binding.logTimeText.setText(log.time) // 게시 시간
             if (log.image.isNullOrBlank()) { // 사진을 첨부하지 않았으면
@@ -201,21 +208,20 @@ class LogFragment : Fragment() {
         }
     }
 
-    // 사용자 id에 해당하는 이름 가져오기
-    private fun getUserName(log: Log): String? {
-        var userName: String? = null
-
-        database.child(Key.DB_USERS).child(log.userId!!).child("name")
+    // 파이어베이스 데이터베이스에서 사용자 id에 해당하는 이름 가져오기
+    private fun getUserName(userId : String, callback : UserNameCallback) {
+        database.child(Key.DB_USERS).child(userId).child("name")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    userName = snapshot.getValue(String::class.java)
+                    val userName = snapshot.getValue(String::class.java)
+                    callback.onUserNameRetrieved(userName)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    userName = "알 수 없음"
+                    callback.onUserNameRetrieved("알 수 없음")
                 }
-            })
 
-        return userName
+            })
     }
+
 }
