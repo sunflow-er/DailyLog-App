@@ -34,17 +34,18 @@ class LogFragment : Fragment() {
     interface OnLogSelectedListener { // 게시글이 선택되었을 때
         fun onLogSelected()
     }
+
     interface OnAddSelectedListener { // 앱바 메뉴의 게시
         // 글 추가 버튼이 선택되었을 때
         fun onAddSelected()
     }
 
-    private lateinit var binding : FragmentLogBinding
-    private lateinit var currentUser : FirebaseUser
-    private lateinit var database : DatabaseReference
+    private lateinit var binding: FragmentLogBinding
+    private lateinit var currentUser: FirebaseUser
+    private lateinit var database: DatabaseReference
 
-    private var onLogSelectedListener : OnLogSelectedListener? = null
-    private var onAddSelectedListener : OnAddSelectedListener? = null
+    private var onLogSelectedListener: OnLogSelectedListener? = null
+    private var onAddSelectedListener: OnAddSelectedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +75,7 @@ class LogFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // 앱바 메뉴 인플레이트 및 리스너 설정
-        val menuHost : MenuHost = requireActivity() // 메뉴를 관리하는 호스트
+        val menuHost: MenuHost = requireActivity() // 메뉴를 관리하는 호스트
         val menuProvider = object : MenuProvider { // 메뉴호스트에 메뉴프로바이더 추가, 메뉴 생성 및 항목 선택 처리
 
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) { // 메뉴 생성 시 호출
@@ -87,6 +88,7 @@ class LogFragment : Fragment() {
                         onAddSelectedListener?.onAddSelected() // 새 게시글 작성 프래그먼트로 이동
                         true
                     }
+
                     else -> false
                 }
             }
@@ -108,10 +110,8 @@ class LogFragment : Fragment() {
                 snapshot.children.forEach {
                     val log = it.getValue(Log::class.java)
                     log ?: return
-
-//                    if (log.userId != currentUser.uid) {
-//                        logList.add(log)
-//                    }
+                    
+                    logList.add(log)
                 }
 
                 binding.logRecyclerView.adapter = LogAdapter(logList)
@@ -132,7 +132,8 @@ class LogFragment : Fragment() {
         onLogSelectedListener = null
     }
 
-    private inner class LogHolder(private val binding : ItemLogBinding) : RecyclerView.ViewHolder(binding.root) {
+    private inner class LogHolder(private val binding: ItemLogBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
                 onLogSelectedListener?.onLogSelected()
@@ -148,12 +149,11 @@ class LogFragment : Fragment() {
         }
 
 
-        fun bind(log : Log) {
-
+        fun bind(log: Log) {
             binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24) // 프로필 이미지
             binding.logUserNameText.setText(getUserName(log)) // 사용자 이름
             binding.logDateText.setText(log.date) // 게시 날짜
-            binding.logTimeText.setText(log.date) // 게시 시간
+            binding.logTimeText.setText(log.time) // 게시 시간
             if (log.image.isNullOrBlank()) { // 사진을 첨부하지 않았으면
                 binding.logContentImage.isVisible = false // 보이지 않게
             } else { // 첨부했으면
@@ -175,7 +175,8 @@ class LogFragment : Fragment() {
 
     }
 
-    private inner class LogAdapter(private val logList : List<Log>) : RecyclerView.Adapter<LogHolder>() {
+    private inner class LogAdapter(private val logList: List<Log>) :
+        RecyclerView.Adapter<LogHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogHolder {
             val binding = ItemLogBinding.inflate(layoutInflater, parent, false)
 
@@ -193,13 +194,13 @@ class LogFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance() : LogFragment {
+        fun newInstance(): LogFragment {
             return LogFragment()
         }
     }
 
-    private fun getUserName(log : Log) : String? {
-        var userName : String? = null
+    private fun getUserName(log: Log): String? {
+        var userName: String? = null
 
         database.child(Key.DB_USERS).child(log.userId!!).child("name")
             .addListenerForSingleValueEvent(object : ValueEventListener {
