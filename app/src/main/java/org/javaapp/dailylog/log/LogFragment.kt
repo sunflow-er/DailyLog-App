@@ -157,7 +157,7 @@ class LogFragment : Fragment() {
                 binding.logContentText.isVisible = false // 보이지 않게
             } else { // 작성했다면
                 binding.logContentText.apply {
-                    setText(log.text) // 보이게
+                    text = log.text
                     isVisible = true
                 }
             }

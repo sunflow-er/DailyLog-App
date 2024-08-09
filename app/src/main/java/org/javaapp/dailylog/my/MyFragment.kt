@@ -16,7 +16,10 @@ import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -30,6 +33,8 @@ import org.javaapp.dailylog.OnAddSelectedListener
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.SignInActivity
 import org.javaapp.dailylog.databinding.FragmentMyBinding
+import org.javaapp.dailylog.databinding.ItemMyBinding
+import org.javaapp.dailylog.log.Log
 import org.javaapp.dailylog.log.LogFragment
 import org.javaapp.dailylog.user.User
 
@@ -65,6 +70,11 @@ class MyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.myLogRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = MyLogAdapter(emptyList())
+        }
 
         // 앱바 게시글 추가 메뉴 설정
         val menuHost : MenuHost = requireActivity()
@@ -104,6 +114,26 @@ class MyFragment : Fragment() {
 
         })
 
+        // 내 로그 가져와서 띄우기
+        database.child(Key.DB_LOGS).orderByChild("userId").equalTo(currentUser.uid).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val myLogList = mutableListOf<Log>()
+
+                snapshot.children.forEach {
+                    val myLog = it.getValue(Log::class.java)
+                    myLog ?: return
+
+                    myLogList.add(myLog)
+                }
+
+                binding.myLogRecyclerView.adapter = MyLogAdapter(myLogList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+
         // 내 정보 수정 버튼 리스너 설정
         binding.myEditButton.setOnClickListener {
             showEditProfileDialog()
@@ -114,6 +144,47 @@ class MyFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         onAddSelectedListener = null
+    }
+
+    private inner class MyLogHolder(private val binding : ItemMyBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(log : Log) {
+            binding.myLogDateText.text = log.date
+            binding.myLogTimeText.text = log.time
+            if (log.image.isNullOrBlank()) {
+                binding.myLogContentImage.setImageResource(R.drawable.baseline_home_filled_100) 
+                // binding.myLogContentImage.isVisible = false
+            } else {
+                binding.myLogContentImage.apply {
+                    setImageResource(R.drawable.baseline_image_48) // TODO 이미지 설정
+                    binding.myLogContentImage.isVisible = true
+                }
+            }
+            if (log.text.isNullOrBlank()) {
+                binding.myLogContentText.isVisible = false
+            } else {
+                binding.myLogContentText.apply {
+                    text = log.text
+                    isVisible = true
+                }
+            }
+        }
+    }
+
+    private inner class MyLogAdapter(private val myLogList : List<Log>) : RecyclerView.Adapter<MyLogHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyLogHolder {
+            val binding = ItemMyBinding.inflate(layoutInflater, parent, false)
+
+            return MyLogHolder(binding)
+        }
+
+        override fun getItemCount(): Int {
+            return myLogList.size
+        }
+        override fun onBindViewHolder(holder: MyLogHolder, position: Int) {
+            holder.bind(myLogList[position])
+        }
+
     }
 
     companion object {
