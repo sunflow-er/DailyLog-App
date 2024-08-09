@@ -84,6 +84,7 @@ class MyFragment : Fragment() {
             }
 
         }
+        menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
 
         // 내 정보 가져와서 띄우기
