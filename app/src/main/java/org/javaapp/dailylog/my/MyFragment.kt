@@ -27,15 +27,7 @@ class MyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 임시 로그아웃 버튼 리스너 설정
-        binding.signOutButton.setOnClickListener {
-            Firebase.auth.signOut() // 로그아웃
 
-            // 로그인 화면으로 이동
-            val intent = Intent(requireActivity(), SignInActivity::class.java)
-            startActivity(intent)
-            requireActivity().finish()
-        }
     }
 
 
