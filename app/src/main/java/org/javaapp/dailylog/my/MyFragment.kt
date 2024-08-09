@@ -115,6 +115,7 @@ class MyFragment : Fragment() {
         })
 
         // 내 로그 가져와서 띄우기
+        // equalTo 메서드는 orderByChild 메서드와 함께 사용해야 한다.
         database.child(Key.DB_LOGS).orderByChild("userId").equalTo(currentUser.uid).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val myLogList = mutableListOf<Log>()
