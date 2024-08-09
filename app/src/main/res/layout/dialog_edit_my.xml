@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="8dp"
+    >
+
+    <View
+        android:id="@+id/line_1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="#B5AAAAAA"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/edit_profile_image"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:background="@drawable/round_rect_background"
+        android:src="@drawable/baseline_account_box_24"
+        app:layout_constraintStart_toStartOf="@id/line_1"
+        app:layout_constraintTop_toBottomOf="@id/line_1"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/edit_name_edit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:hint="이름을 입력해 주세요."
+        app:layout_constraintStart_toEndOf="@id/edit_profile_image"
+        app:layout_constraintTop_toTopOf="@id/edit_profile_image"
+        app:layout_constraintEnd_toEndOf="@id/line_1"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/edit_status_message_edit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:hint="상태메시지를 입력해 주세요."
+        app:layout_constraintBottom_toBottomOf="@id/edit_profile_image"
+        app:layout_constraintStart_toStartOf="@id/edit_name_edit"
+        app:layout_constraintEnd_toEndOf="@id/edit_name_edit"
+        android:inputType="text"/>
+
+    <View
+        android:id="@+id/line_2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="#B5AAAAAA"
+        app:layout_constraintTop_toBottomOf="@id/edit_status_message_edit" />
+
+    <Button
+        android:id="@+id/edit_sign_out_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/line_2"
+        android:text="로그아웃"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        />
+
+    <View
+        android:id="@+id/line_3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="#B5AAAAAA"
+        app:layout_constraintTop_toBottomOf="@id/edit_sign_out_button" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
