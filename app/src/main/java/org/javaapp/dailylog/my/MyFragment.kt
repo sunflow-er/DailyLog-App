@@ -1,15 +1,21 @@
 package org.javaapp.dailylog.my
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -20,15 +26,25 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
+import org.javaapp.dailylog.OnAddSelectedListener
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.SignInActivity
 import org.javaapp.dailylog.databinding.FragmentMyBinding
+import org.javaapp.dailylog.log.LogFragment
 import org.javaapp.dailylog.user.User
 
 class MyFragment : Fragment() {
     private lateinit var binding : FragmentMyBinding
     private lateinit var currentUser : FirebaseUser
     private lateinit var database : DatabaseReference
+
+    private var onAddSelectedListener: OnAddSelectedListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        onAddSelectedListener = context as OnAddSelectedListener
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +65,26 @@ class MyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // 앱바 게시글 추가 메뉴 설정
+        val menuHost : MenuHost = requireActivity()
+        val menuProvider = object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_my, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when(menuItem.itemId) {
+                    R.id.add_log -> {
+                        onAddSelectedListener?.onAddSelected()
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+        }
+
 
         // 내 정보 가져와서 띄우기
         database.child(Key.DB_USERS).child(currentUser.uid).addValueEventListener(object : ValueEventListener {
@@ -72,8 +108,11 @@ class MyFragment : Fragment() {
             showEditProfileDialog()
         }
 
-        // 로그아웃 버튼
+    }
 
+    override fun onDetach() {
+        super.onDetach()
+        onAddSelectedListener = null
     }
 
     companion object {
@@ -90,10 +129,22 @@ class MyFragment : Fragment() {
         val statusMessageEdit = dialog.findViewById<EditText>(R.id.edit_status_message_edit)
         val signOutButton = dialog.findViewById<Button>(R.id.edit_sign_out_button)
 
+        // 로그아웃 버튼 리스너 설정
+        signOutButton.setOnClickListener {
+            Firebase.auth.signOut() // 로그아웃
+
+            // 로그인 화면으로 이동
+            val intent = Intent(requireActivity(), SignInActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
+        }
+
         // 현재 데이터를 기본값으로 세팅
         profileImage.setImageResource(R.drawable.baseline_account_box_24)
         nameEdit.setText(binding.myNameText.text)
         statusMessageEdit.setText(binding.myStatusMessageText.text)
+
+
 
         // dialog 생성 및 띄우기, 이벤트 처리
         AlertDialog.Builder(requireContext())// 빌더

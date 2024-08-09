@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
+import org.javaapp.dailylog.OnAddSelectedListener
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.UserNameCallback
 import org.javaapp.dailylog.databinding.FragmentLogBinding
@@ -32,14 +33,8 @@ import org.javaapp.dailylog.getUserName
 
 class LogFragment : Fragment() {
 
-
-    // 프래그먼트에서 이벤트를 전달하기 위한 리스너 인터페이스 정의
     interface OnLogSelectedListener { // 게시글이 선택되었을 때
         fun onLogSelected(logId : String?)
-    }
-    interface OnAddSelectedListener { // 앱바 메뉴의 게시
-        // 글 추가 버튼이 선택되었을 때
-        fun onAddSelected()
     }
 
     private lateinit var binding: FragmentLogBinding
@@ -49,6 +44,13 @@ class LogFragment : Fragment() {
     private var onLogSelectedListener: OnLogSelectedListener? = null
     private var onAddSelectedListener: OnAddSelectedListener? = null
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        onAddSelectedListener = context as OnAddSelectedListener
+        onLogSelectedListener = context as OnLogSelectedListener
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,12 +58,7 @@ class LogFragment : Fragment() {
         database = Firebase.database(Key.DB_URL).reference
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
 
-        onAddSelectedListener = context as OnAddSelectedListener
-        onLogSelectedListener = context as OnLogSelectedListener
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
