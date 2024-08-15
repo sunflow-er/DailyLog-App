@@ -78,6 +78,7 @@ class AddLogFragment : Fragment() {
         binding.addButton.setOnClickListener {
 
             val logId = UUID.randomUUID().toString() // 로그 아이디
+            val timeStamp = System.currentTimeMillis().toString()
             val (date, time) = formatDateTimeNow() // 포맷팅된 현재 날짜 및 시간
 
             // 저장할 로그 정보
@@ -90,6 +91,7 @@ class AddLogFragment : Fragment() {
             log["image"] = ""
             log["likeCount"] = 0
             log["commentCount"] = 0
+            log["timeStamp"] = timeStamp
 
             // 파이어베이스 데이터베이스에 로그 정보 저장
             database

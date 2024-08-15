@@ -1,6 +1,8 @@
 package org.javaapp.dailylog.log
 
 import android.os.Bundle
+import android.renderscript.Sampler.Value
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -9,9 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -24,16 +29,22 @@ import org.javaapp.dailylog.UserNameCallback
 import org.javaapp.dailylog.databinding.FragmentCommentLogBinding
 import org.javaapp.dailylog.databinding.FragmentLogBinding
 import org.javaapp.dailylog.databinding.ItemCommentBinding
+import org.javaapp.dailylog.formatText
 import org.javaapp.dailylog.getUserName
+import java.time.LocalDateTime
+import java.util.Date
+import java.util.UUID
 
 
 class CommentLogFragment(private val logId : String?) : Fragment() {
     private lateinit var binding : FragmentCommentLogBinding
+    private lateinit var currentUser : FirebaseUser
     private lateinit var database : DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        currentUser = Firebase.auth.currentUser!!
         database = Firebase.database.reference
     }
 
@@ -73,27 +84,83 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
             layoutManager = NonScrollableLinearLayoutManager(context)
             adapter = CommentAdapter(emptyList())
         }
+        
+        // 댓글 입력 버튼 리스너 설정
+        binding.commentSendButton.setOnClickListener {
 
+            val commentId = UUID.randomUUID().toString() // 현재 시간(나노초)을 기준으로 고유 아이디값 생성
+            val timeStamp = System.currentTimeMillis().toString() // 타임스탬프
+
+            val comment = mutableMapOf<String, Any>()
+            comment["id"] = commentId
+            comment["userId"] = currentUser.uid
+            comment["comment"] = formatText(binding.commentTypeEdit.text.toString())
+            comment["timeStamp"] = timeStamp
+
+            database.child(Key.DB_COMMENTS).child(logId!!).child(commentId).setValue(comment)
+
+            binding.commentTypeEdit.text.clear()
+        }
+
+        // 로그 정보 가져오기
         database.child(Key.DB_LOGS).child(logId!!).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val log = snapshot.getValue(Log::class.java)
                 bindLog(log!!)
-                // bindComment()
             }
 
             override fun onCancelled(error: DatabaseError) {
-                //
             }
 
         })
+        
+        // 댓글 정보 가져오기
+        database.child(Key.DB_COMMENTS).child(logId).orderByChild("timeStamp").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val commentList = mutableListOf<Comment>()
 
+                snapshot.children.forEach {
+                    val comment = it.getValue(Comment::class.java)
+                    comment ?: return
+
+                    commentList.add(comment)
+                }
+
+                binding.commentRecyclerView.adapter = CommentAdapter(commentList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+        })
     }
 
     private inner class CommentHolder(private val binding : ItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(comment : Comment) {
-            binding.commentUserProfileImage.setImageResource(R.drawable.baseline_account_box_24)
-            binding.commentUserNameText.text = comment.userId
-            binding.commentContentText.text = comment.comment
+        fun bind(comment : Comment) { // 내가 쓴 댓글일 때
+            if (comment.userId == currentUser.uid) {
+                binding.commentUserProfileImage.isVisible = false // 프로필 이미지 화면에서 지움
+                binding.commentUserNameText.isVisible = false // 이름 화면에서 지움
+                binding.commentContentText.apply {
+                    text = comment.comment
+                    gravity = Gravity.END
+                }
+                binding.commentLinearLayout.gravity = Gravity.END // 오른쪽 배치
+            } else { // 다른 사람이 쓴 댓글일 때
+                binding.commentUserProfileImage.apply {
+                    isVisible = true
+                    setImageResource(R.drawable.baseline_account_box_24)
+                }
+                binding.commentUserNameText.apply {
+                    isVisible = true
+                    binding.commentUserNameText.text = comment.userId
+                }
+                binding.commentContentText.apply {
+                    text = comment.comment
+                    gravity = Gravity.START
+                }
+                binding.commentLinearLayout.gravity = Gravity.START // 왼쪽 배치
+            }
+
         }
     }
 
@@ -126,5 +193,7 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
         binding.commentContentImage.setImageResource(R.drawable.baseline_home_filled_100)
         binding.commentContentText.text = log.text
     }
+
+
 
 }

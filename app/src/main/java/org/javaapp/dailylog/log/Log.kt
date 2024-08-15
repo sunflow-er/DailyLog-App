@@ -9,4 +9,5 @@ data class Log(
     val image : String? = null,
     var likeCount : Int? = null,
     var commentCount : Int? = null,
+    val timeStamp : String? = null,
 )

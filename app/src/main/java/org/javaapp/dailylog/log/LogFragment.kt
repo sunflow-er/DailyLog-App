@@ -102,7 +102,7 @@ class LogFragment : Fragment() {
         }
 
         // 파이어베이스 데이터베이스에서 로그 정보 가져오기 (업데이트 될때마다)
-        database.child(Key.DB_LOGS).addValueEventListener(object : ValueEventListener {
+        database.child(Key.DB_LOGS).orderByChild("timeStamp").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val logList = mutableListOf<Log>()
 
