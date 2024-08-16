@@ -127,6 +127,9 @@ class MyFragment : Fragment() {
                     myLogList.add(myLog)
                 }
 
+                // 생성 시간을 기준으로 정렬
+                myLogList.sortByDescending { it.timeStamp }
+
                 binding.myLogRecyclerView.adapter = MyLogAdapter(myLogList)
             }
 

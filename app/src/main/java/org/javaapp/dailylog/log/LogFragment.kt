@@ -102,7 +102,7 @@ class LogFragment : Fragment() {
         }
 
         // 파이어베이스 데이터베이스에서 로그 정보 가져오기 (업데이트 될때마다)
-        database.child(Key.DB_LOGS).orderByChild("timeStamp").addValueEventListener(object : ValueEventListener {
+        database.child(Key.DB_LOGS).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val logList = mutableListOf<Log>()
 
@@ -112,6 +112,9 @@ class LogFragment : Fragment() {
 
                     logList.add(log)
                 }
+
+                // 생성 시간 기준 정렬
+                logList.sortByDescending { it.timeStamp }
 
                 binding.logRecyclerView.adapter = LogAdapter(logList)
             }
