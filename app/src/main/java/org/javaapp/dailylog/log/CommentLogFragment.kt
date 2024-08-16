@@ -70,8 +70,14 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
-                    R.id.back_to_log -> {
-                        requireActivity().supportFragmentManager.popBackStack() // 뒤로 가기
+                    R.id.modify_my_log -> {
+                        // TODO 로그 내용 수정
+                        true
+                    }
+                    R.id.delete_my_log -> {
+                        database.child(Key.DB_LOGS).child(logId!!).removeValue() // 데이터 삭제
+
+                        requireActivity().supportFragmentManager.popBackStack()  // 프래그먼트 종료
                         true
                     }
                     else -> false

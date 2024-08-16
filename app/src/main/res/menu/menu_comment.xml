@@ -3,11 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/back_to_log"
-        android:icon="@drawable/baseline_arrow_back_24"
-        android:iconTint="@color/white"
-        android:iconTintMode="src_in"
-        android:title="뒤로 가기"
-        app:showAsAction="ifRoom|withText"
+        android:id="@+id/modify_my_log"
+        android:icon="@drawable/baseline_border_color_24"
+        android:title="수정하기"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/delete_my_log"
+        android:icon="@drawable/baseline_delete_24"
+        android:title="삭제하기"
+        app:showAsAction="never"
         />
 </menu>
