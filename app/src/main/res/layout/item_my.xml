@@ -64,6 +64,44 @@
             app:layout_constraintTop_toBottomOf="@id/my_log_content_image"
             tools:text="my home" />
 
+        <View
+            android:id="@+id/line_2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:background="#B5AAAAAA"
+            app:layout_constraintTop_toBottomOf="@id/my_log_content_text" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/line_2">
+
+            <ImageView
+                android:id="@+id/my_log_like_button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/baseline_favorite_border_24"
+                android:paddingTop="8dp"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#B5AAAAAA" />
+
+
+            <ImageView
+                android:id="@+id/my_log_comment_button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/baseline_density_medium_24"
+                android:paddingTop="8dp"/>
+
+        </LinearLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
