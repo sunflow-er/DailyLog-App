@@ -80,6 +80,7 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
         }
         menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
+        // 댓글 리사이클러뷰 설정
         binding.commentRecyclerView.apply {
             layoutManager = NonScrollableLinearLayoutManager(context)
             adapter = CommentAdapter(emptyList())
@@ -141,7 +142,11 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
                 binding.commentUserProfileImage.isVisible = false // 프로필 이미지 화면에서 지움
                 binding.commentUserNameText.isVisible = false // 이름 화면에서 지움
                 binding.commentContentText.apply {
-                    text = comment.comment
+                    getUserName(database, comment.userId, object : UserNameCallback {
+                        override fun onUserNameRetrieved(userName: String?) {
+                            text = userName
+                        }
+                    })
                     gravity = Gravity.END
                 }
                 binding.commentLinearLayout.gravity = Gravity.END // 오른쪽 배치
@@ -155,7 +160,11 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
                     binding.commentUserNameText.text = comment.userId
                 }
                 binding.commentContentText.apply {
-                    text = comment.comment
+                    getUserName(database, comment.userId!!, object : UserNameCallback {
+                        override fun onUserNameRetrieved(userName: String?) {
+                            text = userName
+                        }
+                    })
                     gravity = Gravity.START
                 }
                 binding.commentLinearLayout.gravity = Gravity.START // 왼쪽 배치
