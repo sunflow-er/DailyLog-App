@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -160,13 +161,14 @@ class MyFragment : Fragment() {
             binding.myLogDateText.text = log.date
             binding.myLogTimeText.text = log.time
             if (log.image.isNullOrBlank()) {
-                binding.myLogContentImage.setImageResource(R.drawable.baseline_home_filled_100) 
-                // binding.myLogContentImage.isVisible = false
+                binding.myLogContentImage.isVisible = false
             } else {
-                binding.myLogContentImage.apply {
-                    setImageResource(R.drawable.baseline_image_48) // TODO 이미지 설정
-                    binding.myLogContentImage.isVisible = true
-                }
+                binding.myLogContentImage.isVisible = true
+
+                // 이미지 띄우기
+                Glide.with(requireContext())
+                    .load(log.image)
+                    .into(binding.myLogContentImage)
             }
             if (log.text.isNullOrBlank()) {
                 binding.myLogContentText.isVisible = false
