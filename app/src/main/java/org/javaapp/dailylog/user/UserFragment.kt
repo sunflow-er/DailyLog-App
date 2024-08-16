@@ -74,7 +74,14 @@ class UserFragment : Fragment() {
         fun bind(user : User) {
             binding.userProfileImage.setImageResource(user.profileImage ?: R.drawable.baseline_account_box_24)
             binding.userNameText.text = user.name
-            binding.userStatusMessageText.text = user.statusMessage
+            if (user.statusMessage.isNullOrBlank()) {
+                binding.userStatusMessageText.visibility = View.INVISIBLE
+            } else {
+                binding.userStatusMessageText.apply {
+                    visibility = View.VISIBLE
+                    text = user.statusMessage
+                }
+            }
         }
     }
 
