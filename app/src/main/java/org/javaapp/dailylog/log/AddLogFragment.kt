@@ -1,7 +1,11 @@
 package org.javaapp.dailylog.log
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -12,6 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -24,6 +29,8 @@ import org.javaapp.dailylog.databinding.FragmentAddLogBinding
 import org.javaapp.dailylog.formatDateTimeNow
 import org.javaapp.dailylog.formatText
 import java.util.UUID
+
+private const val PICK_IMAGE_REQUEST = 1
 
 class AddLogFragment : Fragment() {
 
@@ -71,7 +78,7 @@ class AddLogFragment : Fragment() {
         menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
         binding.addImage.setOnClickListener {
-            // TODO 이미지 불러오기
+            openGallery() // 갤러리 열기
         }
 
         // 업로드 버튼 리스너 설정
@@ -102,6 +109,30 @@ class AddLogFragment : Fragment() {
             // 프래그먼트 종료
             requireActivity().supportFragmentManager.popBackStack()
         }
+    }
+
+    // 갤러리 열기 함수
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, PICK_IMAGE_REQUEST) // 갤러리 열기
+    }
+
+    // 갤러리에서 선택한 이미지 처리
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            data?.data?.let { uri -> 
+                loadImageFromUri(uri)
+            }
+        }
+    }
+    
+    // 선택한 이미지의 URI를 ImageView에 업로드
+    private fun loadImageFromUri(uri : Uri) {
+        Glide.with(this) // Context
+            .load(uri) // URI
+            .into(binding.addImage) // View
     }
 
 
