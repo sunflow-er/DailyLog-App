@@ -12,6 +12,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -37,6 +38,8 @@ class AddLogFragment : Fragment() {
     private lateinit var binding : FragmentAddLogBinding
     private lateinit var currentUser : FirebaseUser // user
     private lateinit var database : DatabaseReference // database
+
+    private var formattedText : String = ""// 업로드할 텍스트
     private var imageUri : Uri? = null // 업로드할 이미지의 URI
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,31 +87,36 @@ class AddLogFragment : Fragment() {
 
         // 업로드 버튼 리스너 설정
         binding.addButton.setOnClickListener {
+            formattedText = formatText(binding.addTextEdit.text.toString())
 
-            val logId = UUID.randomUUID().toString() // 로그 아이디
-            val timeStamp = System.currentTimeMillis().toString()
-            val (date, time) = formatDateTimeNow() // 포맷팅된 현재 날짜 및 시간
+            if (imageUri == null && formattedText.isNullOrBlank()) {
+                Toast.makeText(requireContext(), "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
+            } else {
+                val logId = UUID.randomUUID().toString() // 로그 아이디
+                val timeStamp = System.currentTimeMillis().toString()
+                val (date, time) = formatDateTimeNow() // 포맷팅된 현재 날짜 및 시간
 
-            // 저장할 로그 정보
-            val log = mutableMapOf<String, Any>()
-            log["id"] = logId
-            log["userId"] = currentUser.uid
-            log["date"] = date
-            log["time"] = time
-            log["text"] = formatText(binding.addTextEdit.text.toString())
-            log["image"] = imageUri?.toString() ?: ""
-            log["likeCount"] = 0
-            log["commentCount"] = 0
-            log["timeStamp"] = timeStamp
+                // 저장할 로그 정보
+                val log = mutableMapOf<String, Any>()
+                log["id"] = logId
+                log["userId"] = currentUser.uid
+                log["date"] = date
+                log["time"] = time
+                log["text"] = formattedText
+                log["image"] = imageUri?.toString() ?: ""
+                log["likeCount"] = 0
+                log["commentCount"] = 0
+                log["timeStamp"] = timeStamp
 
-            // 파이어베이스 데이터베이스에 로그 정보 저장
-            database
-                .child(Key.DB_LOGS)
-                .child(logId)
-                .setValue(log)
+                // 파이어베이스 데이터베이스에 로그 정보 저장
+                database
+                    .child(Key.DB_LOGS)
+                    .child(logId)
+                    .setValue(log)
 
-            // 프래그먼트 종료
-            requireActivity().supportFragmentManager.popBackStack()
+                // 프래그먼트 종료
+                requireActivity().supportFragmentManager.popBackStack()
+            }
         }
     }
 
