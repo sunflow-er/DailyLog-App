@@ -24,6 +24,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.OnAddSelectedListener
+import org.javaapp.dailylog.OnLogSelectedListener
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.UserNameCallback
 import org.javaapp.dailylog.databinding.FragmentLogBinding
@@ -32,10 +33,6 @@ import org.javaapp.dailylog.getUserName
 
 
 class LogFragment : Fragment() {
-
-    interface OnLogSelectedListener { // 게시글이 선택되었을 때
-        fun onLogSelected(logId : String?)
-    }
 
     private lateinit var binding: FragmentLogBinding
     private lateinit var currentUser: FirebaseUser

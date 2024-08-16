@@ -30,6 +30,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.OnAddSelectedListener
+import org.javaapp.dailylog.OnLogSelectedListener
 import org.javaapp.dailylog.R
 import org.javaapp.dailylog.SignInActivity
 import org.javaapp.dailylog.databinding.FragmentMyBinding
@@ -44,11 +45,13 @@ class MyFragment : Fragment() {
     private lateinit var database : DatabaseReference
 
     private var onAddSelectedListener: OnAddSelectedListener? = null
+    private var onLogSelectedListener : OnLogSelectedListener? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         onAddSelectedListener = context as OnAddSelectedListener
+        onLogSelectedListener = context as OnLogSelectedListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -148,6 +151,7 @@ class MyFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         onAddSelectedListener = null
+        onLogSelectedListener = null
     }
 
     private inner class MyLogHolder(private val binding : ItemMyBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -171,6 +175,11 @@ class MyFragment : Fragment() {
                     text = log.text
                     isVisible = true
                 }
+            }
+
+            // 리스너 설정
+            binding.root.setOnClickListener {
+                onLogSelectedListener?.onLogSelected(log.id)
             }
         }
     }

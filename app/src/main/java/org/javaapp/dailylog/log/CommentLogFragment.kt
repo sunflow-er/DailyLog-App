@@ -85,23 +85,6 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
             layoutManager = NonScrollableLinearLayoutManager(context)
             adapter = CommentAdapter(emptyList())
         }
-        
-        // 댓글 입력 버튼 리스너 설정
-        binding.commentSendButton.setOnClickListener {
-
-            val commentId = UUID.randomUUID().toString() // 현재 시간(나노초)을 기준으로 고유 아이디값 생성
-            val timeStamp = System.currentTimeMillis().toString() // 타임스탬프
-
-            val comment = mutableMapOf<String, Any>()
-            comment["id"] = commentId
-            comment["userId"] = currentUser.uid
-            comment["comment"] = formatText(binding.commentTypeEdit.text.toString())
-            comment["timeStamp"] = timeStamp
-
-            database.child(Key.DB_COMMENTS).child(logId!!).child(commentId).setValue(comment)
-
-            binding.commentTypeEdit.text.clear()
-        }
 
         // 로그 정보 가져오기
         database.child(Key.DB_LOGS).child(logId!!).addListenerForSingleValueEvent(object : ValueEventListener {
@@ -134,6 +117,23 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
             }
 
         })
+
+        // 댓글 입력 버튼 리스너 설정
+        binding.commentSendButton.setOnClickListener {
+
+            val commentId = UUID.randomUUID().toString() // 현재 시간(나노초)을 기준으로 고유 아이디값 생성
+            val timeStamp = System.currentTimeMillis().toString() // 타임스탬프
+
+            val comment = mutableMapOf<String, Any>()
+            comment["id"] = commentId
+            comment["userId"] = currentUser.uid
+            comment["comment"] = formatText(binding.commentTypeEdit.text.toString())
+            comment["timeStamp"] = timeStamp
+
+            database.child(Key.DB_COMMENTS).child(logId!!).child(commentId).setValue(comment)
+
+            binding.commentTypeEdit.text.clear()
+        }
     }
 
     private inner class CommentHolder(private val binding : ItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {

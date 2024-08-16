@@ -14,7 +14,7 @@ import org.javaapp.dailylog.log.LogFragment
 import org.javaapp.dailylog.my.MyFragment
 import org.javaapp.dailylog.user.UserFragment
 
-class MainActivity : AppCompatActivity(), OnAddSelectedListener, LogFragment.OnLogSelectedListener {
+class MainActivity : AppCompatActivity(), OnAddSelectedListener, OnLogSelectedListener {
     private lateinit var binding : ActivityMainBinding
     private lateinit var auth: FirebaseAuth // firebase auth
 
