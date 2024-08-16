@@ -139,32 +139,28 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
     private inner class CommentHolder(private val binding : ItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(comment : Comment) { // 내가 쓴 댓글일 때
             if (comment.userId == currentUser.uid) {
-                binding.commentUserProfileImage.isVisible = false // 프로필 이미지 화면에서 지움
-                binding.commentUserNameText.isVisible = false // 이름 화면에서 지움
+                binding.commentUserProfileImage.visibility = View.INVISIBLE // 프로필 이미지 화면에서 지움
+                binding.commentUserNameText.visibility = View.INVISIBLE // 이름 화면에서 지움
                 binding.commentContentText.apply {
-                    getUserName(database, comment.userId, object : UserNameCallback {
-                        override fun onUserNameRetrieved(userName: String?) {
-                            text = userName
-                        }
-                    })
+                    text = comment.comment
                     gravity = Gravity.END
                 }
                 binding.commentLinearLayout.gravity = Gravity.END // 오른쪽 배치
             } else { // 다른 사람이 쓴 댓글일 때
                 binding.commentUserProfileImage.apply {
-                    isVisible = true
+                    visibility = View.VISIBLE
                     setImageResource(R.drawable.baseline_account_box_24)
                 }
-                binding.commentUserNameText.apply {
-                    isVisible = true
-                    binding.commentUserNameText.text = comment.userId
-                }
-                binding.commentContentText.apply {
-                    getUserName(database, comment.userId!!, object : UserNameCallback {
-                        override fun onUserNameRetrieved(userName: String?) {
+                getUserName(database, comment.userId!!, object : UserNameCallback {
+                    override fun onUserNameRetrieved(userName: String?) {
+                        binding.commentUserNameText.apply {
+                            visibility = View.VISIBLE
                             text = userName
                         }
-                    })
+                    }
+                })
+                binding.commentContentText.apply {
+                    text = comment.comment
                     gravity = Gravity.START
                 }
                 binding.commentLinearLayout.gravity = Gravity.START // 왼쪽 배치

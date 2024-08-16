@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-   android:paddingStart="8dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingStart="8dp"
     android:paddingTop="8dp"
     android:paddingEnd="8dp">
 
@@ -14,7 +15,21 @@
         android:background="@drawable/round_rect_background"
         android:src="@drawable/baseline_account_box_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/comment_user_name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:hint="ABC"
+        android:textSize="8sp"
+        app:layout_constraintEnd_toEndOf="@id/comment_user_profile_image"
+        app:layout_constraintStart_toStartOf="@id/comment_user_profile_image"
+        app:layout_constraintTop_toBottomOf="@id/comment_user_profile_image"
+        android:gravity="center"
+        android:textStyle="bold"/>
 
     <LinearLayout
         android:id="@+id/comment_linear_layout"
@@ -22,28 +37,21 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/comment_user_name_text"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/comment_user_profile_image"
         app:layout_constraintTop_toTopOf="@id/comment_user_profile_image"
-        app:layout_constraintEnd_toEndOf="parent"
         >
-
-        <TextView
-            android:id="@+id/comment_user_name_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="user name"
-            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/comment_content_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:background="@drawable/round_rect_background"
-            android:hint="content"
             android:inputType="textMultiLine"
-            android:padding="8dp"
+            tools:text="hello"
             android:textSize="16sp"
+            android:padding="8dp"
             />
 
     </LinearLayout>
@@ -53,8 +61,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
-        android:background="#B5AAAAAA"
-        app:layout_constraintTop_toBottomOf="@id/comment_linear_layout" />
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/comment_user_name_text" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
