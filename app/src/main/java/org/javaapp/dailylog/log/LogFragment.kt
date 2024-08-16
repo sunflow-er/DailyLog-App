@@ -8,12 +8,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -137,6 +139,7 @@ class LogFragment : Fragment() {
         fun bind(log: Log) {
             // 바인딩
             binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24) // 프로필 이미지
+
             getUserName(database ,log.userId!!, object : UserNameCallback { // 사용자 이름
                 override fun onUserNameRetrieved(userName: String?) {
                     binding.logUserNameText.text = userName
@@ -144,15 +147,19 @@ class LogFragment : Fragment() {
             })
             binding.logDateText.setText(log.date) // 게시 날짜
             binding.logTimeText.setText(log.time) // 게시 시간
+
             if (log.image.isNullOrBlank()) { // 사진을 첨부하지 않았으면
-                binding.logContentImage.setImageResource(R.drawable.baseline_home_filled_100)
-               //  binding.logContentImage.isVisible = false // 보이지 않게
+                binding.logContentImage.isVisible = false // 보이지 않게
             } else { // 첨부했으면
-                binding.logContentImage.apply {
-                    setImageResource(R.drawable.baseline_image_48) // 보이게
-                    isVisible = true
-                }
+                binding.logContentImage.isVisible = true
+
+                // 이미지 업로드
+                Glide.with(requireContext())
+                    .load(log.image.toUri())
+                    .into(binding.logContentImage)
+
             }
+
             if (log.text.isNullOrBlank()) { // 글을 작성하지 않았으면
                 binding.logContentText.isVisible = false // 보이지 않게
             } else { // 작성했다면
