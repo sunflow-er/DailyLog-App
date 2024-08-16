@@ -37,6 +37,7 @@ class AddLogFragment : Fragment() {
     private lateinit var binding : FragmentAddLogBinding
     private lateinit var currentUser : FirebaseUser // user
     private lateinit var database : DatabaseReference // database
+    private var imageUri : Uri? = null // 업로드할 이미지의 URI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +96,7 @@ class AddLogFragment : Fragment() {
             log["date"] = date
             log["time"] = time
             log["text"] = formatText(binding.addTextEdit.text.toString())
-            log["image"] = ""
+            log["image"] = imageUri?.toString() ?: ""
             log["likeCount"] = 0
             log["commentCount"] = 0
             log["timeStamp"] = timeStamp
@@ -122,7 +123,8 @@ class AddLogFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-            data?.data?.let { uri -> 
+            data?.data?.let { uri ->
+                imageUri = uri
                 loadImageFromUri(uri)
             }
         }
