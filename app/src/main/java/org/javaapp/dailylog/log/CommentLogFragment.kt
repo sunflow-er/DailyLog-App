@@ -1,5 +1,6 @@
 package org.javaapp.dailylog.log
 
+import android.content.Context
 import android.os.Bundle
 import android.renderscript.Sampler.Value
 import android.view.Gravity
@@ -9,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.net.toUri
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -140,7 +142,11 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
 
             database.child(Key.DB_COMMENTS).child(logId!!).child(commentId).setValue(comment)
 
-            binding.commentTypeEdit.text.clear()
+            binding.commentTypeEdit.text.clear() // 내용 비우기
+
+            // 키보드 내리기
+            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(binding.commentTypeEdit.windowToken, 0) // commentTypeEdit 윈도우의 키보드를 숨긴다.
         }
     }
 
