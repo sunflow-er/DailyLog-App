@@ -9,12 +9,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -88,7 +90,7 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
 
         // 댓글 리사이클러뷰 설정
         binding.commentRecyclerView.apply {
-            layoutManager = NonScrollableLinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
             adapter = CommentAdapter(emptyList())
         }
 
@@ -201,7 +203,19 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
         })
         binding.commentDateText.text = log.date
         binding.commentTimeText.text = log.time
-        binding.commentContentImage.setImageResource(R.drawable.baseline_home_filled_100)
+
+        if (log.image.isNullOrBlank()) { // 사진을 첨부하지 않았으면
+            binding.commentContentImage.isVisible = false // 보이지 않게
+        } else { // 첨부했으면
+            binding.commentContentImage.isVisible = true
+
+            // 이미지 업로드
+            Glide.with(requireContext())
+                .load(log.image.toUri())
+                .into(binding.commentContentImage)
+
+        }
+
         binding.commentContentText.text = log.text
     }
 
