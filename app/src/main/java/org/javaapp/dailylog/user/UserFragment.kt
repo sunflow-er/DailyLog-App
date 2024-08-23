@@ -72,7 +72,7 @@ class UserFragment : Fragment() {
     private inner class UserHolder(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(user : User) {
-            binding.userProfileImage.setImageResource(user.profileImage ?: R.drawable.baseline_account_box_24)
+//            binding.userProfileImage.setImageResource()
             binding.userNameText.text = user.name
             if (user.statusMessage.isNullOrBlank()) {
                 binding.userStatusMessageText.visibility = View.INVISIBLE
