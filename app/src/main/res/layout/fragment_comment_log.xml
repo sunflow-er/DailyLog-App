@@ -7,7 +7,7 @@
     >
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/comment_scroll_view"
+        android:id="@+id/comment_nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"

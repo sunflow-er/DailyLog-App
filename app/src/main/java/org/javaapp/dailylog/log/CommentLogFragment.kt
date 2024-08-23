@@ -142,11 +142,15 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
 
             database.child(Key.DB_COMMENTS).child(logId!!).child(commentId).setValue(comment)
 
-            binding.commentTypeEdit.text.clear() // 내용 비우기
+            // EditText 내용 비우기
+            binding.commentTypeEdit.text.clear()
 
             // 키보드 내리기
             val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(binding.commentTypeEdit.windowToken, 0) // commentTypeEdit 윈도우의 키보드를 숨긴다.
+
+            // 스크롤뷰 맨 아래로 이동
+            binding.commentNestedScrollView.fullScroll(View.FOCUS_DOWN) // 주어진 방향으로 스크롤 뷰를 완전히 스크롤
         }
     }
 
