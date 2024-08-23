@@ -81,6 +81,7 @@ class AddLogFragment : Fragment() {
         }
         menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
+        // 이미지 추가하기
         binding.addImage.setOnClickListener {
             openGallery() // 갤러리 열기
         }
@@ -120,7 +121,7 @@ class AddLogFragment : Fragment() {
         }
     }
 
-    // 갤러리 열기 함수
+    // 갤러리 열기
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, PICK_IMAGE_REQUEST) // 갤러리 열기
