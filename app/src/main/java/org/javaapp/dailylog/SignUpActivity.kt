@@ -26,8 +26,6 @@ class SignUpActivity : AppCompatActivity() {
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        currentUser = Firebase.auth.currentUser!!
-
         binding.signUpButton.setOnClickListener {
             val name = binding.nameEdit.text.toString()
             val email = binding.emailEdit.text.toString()
@@ -45,6 +43,8 @@ class SignUpActivity : AppCompatActivity() {
         Firebase.auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) { // 계정 생성에 성공, 자동 로그인
                 Log.d(TAG, "createUserWithEmail : success")
+
+                currentUser = Firebase.auth.currentUser!!
 
                 // 회원가입 완료 시 해당 계정에 대한 정보를 firebase realtime database에 생성 및 저장
                 val user = mutableMapOf<String, Any>() // 사용자 정보를 저장할 맵 생성

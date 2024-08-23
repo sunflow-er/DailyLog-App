@@ -7,7 +7,7 @@
     >
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/comment_nested_scroll_view"
+        android:id="@+id/comment_log_nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintBottom_toTopOf="@id/comment_type_constraint_layout"
+        app:layout_constraintBottom_toTopOf="@id/comment_log_type_constraint_layout"
         android:padding="8dp"
         >
 
@@ -25,43 +25,43 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/comment_user_profile_image"
+                android:id="@+id/comment_log_user_profile_image"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@drawable/round_rect_background"
-                android:src="@drawable/baseline_account_box_24"
+                tools:src="@drawable/baseline_account_box_24"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/comment_user_name_text"
+                android:id="@+id/comment_log_user_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/comment_user_profile_image"
-                app:layout_constraintStart_toEndOf="@+id/comment_user_profile_image"
-                app:layout_constraintTop_toTopOf="@+id/comment_user_profile_image"
+                app:layout_constraintBottom_toBottomOf="@id/comment_log_user_profile_image"
+                app:layout_constraintStart_toEndOf="@+id/comment_log_user_profile_image"
+                app:layout_constraintTop_toTopOf="@+id/comment_log_user_profile_image"
                 tools:text="user name" />
 
             <TextView
-                android:id="@+id/comment_date_text"
+                android:id="@+id/comment_log_date_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                app:layout_constraintBottom_toTopOf="@id/comment_time_text"
-                app:layout_constraintEnd_toEndOf="@id/comment_time_text"
+                app:layout_constraintBottom_toTopOf="@id/comment_log_time_text"
+                app:layout_constraintEnd_toEndOf="@id/comment_log_time_text"
                 tools:text="2024/08/01 (목)" />
 
             <TextView
-                android:id="@+id/comment_time_text"
+                android:id="@+id/comment_log_time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="4dp"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/comment_user_profile_image"
+                app:layout_constraintBottom_toBottomOf="@+id/comment_log_user_profile_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="21:52" />
 
@@ -71,10 +71,10 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="8dp"
                 android:background="#B5AAAAAA"
-                app:layout_constraintTop_toBottomOf="@id/comment_user_profile_image" />
+                app:layout_constraintTop_toBottomOf="@id/comment_log_user_profile_image" />
 
             <ImageView
-                android:id="@+id/comment_content_image"
+                android:id="@+id/comment_log_content_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -83,13 +83,13 @@
                 app:layout_constraintTop_toBottomOf="@id/line_1" />
 
             <TextView
-                android:id="@+id/comment_content_text"
+                android:id="@+id/comment_log_content_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:padding="8dp"
                 android:textSize="16sp"
-                app:layout_constraintTop_toBottomOf="@id/comment_content_image"
+                app:layout_constraintTop_toBottomOf="@id/comment_log_content_image"
                 tools:text="my home" />
 
             <View
@@ -98,10 +98,10 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="8dp"
                 android:background="#B5AAAAAA"
-                app:layout_constraintTop_toBottomOf="@id/comment_content_text" />
+                app:layout_constraintTop_toBottomOf="@id/comment_log_content_text" />
 
             <ImageView
-                android:id="@+id/comment_like_button"
+                android:id="@+id/comment_log_like_button"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
@@ -116,10 +116,10 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="8dp"
                 android:background="#B5AAAAAA"
-                app:layout_constraintTop_toBottomOf="@id/comment_like_button" />
+                app:layout_constraintTop_toBottomOf="@id/comment_log_like_button" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/comment_recycler_view"
+                android:id="@+id/comment_log_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_constraintEnd_toEndOf="@id/line_3"
@@ -135,7 +135,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/comment_type_constraint_layout"
+        android:id="@+id/comment_log_type_constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -153,10 +153,10 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="#B5AAAAAA"
-            app:layout_constraintBottom_toTopOf="@id/comment_type_edit" />
+            app:layout_constraintBottom_toTopOf="@id/comment_log_type_edit" />
 
         <EditText
-            android:id="@+id/comment_type_edit"
+            android:id="@+id/comment_log_type_edit"
             android:layout_width="296dp"
             android:layout_height="40dp"
             android:inputType="text"
@@ -166,17 +166,17 @@
             tools:hint="comment" />
 
         <ImageView
-            android:id="@+id/comment_send_button"
+            android:id="@+id/comment_log_send_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="8dp"
             android:background="@drawable/round_rect_background"
             android:src="@drawable/baseline_check_32"
-            app:layout_constraintBottom_toBottomOf="@id/comment_type_edit"
+            app:layout_constraintBottom_toBottomOf="@id/comment_log_type_edit"
             app:layout_constraintEnd_toEndOf="@id/line_4"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@id/comment_type_edit"
-            app:layout_constraintTop_toTopOf="@id/comment_type_edit"
+            app:layout_constraintStart_toEndOf="@id/comment_log_type_edit"
+            app:layout_constraintTop_toTopOf="@id/comment_log_type_edit"
             app:layout_constraintVertical_bias="0.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

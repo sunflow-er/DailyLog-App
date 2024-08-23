@@ -20,7 +20,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@drawable/round_rect_background"
-            android:src="@drawable/baseline_account_box_24"
+            tools:src="@drawable/baseline_account_box_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@drawable/round_rect_background"
-            android:src="@drawable/baseline_home_filled_100"
+            tools:src="@drawable/baseline_home_filled_100"
             app:layout_constraintTop_toBottomOf="@id/line_1" />
 
         <TextView

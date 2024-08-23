@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -21,19 +22,16 @@ import org.javaapp.dailylog.databinding.ActivitySignInBinding
 private const val TAG = "SignInActivity"
 private const val EMAIL_KEY = "email"
 private const val PASSWORD_KEY = "password"
+private const val SIGN_UP = 1
 
 class SignInActivity : AppCompatActivity() {
-    private lateinit var binding : ActivitySignInBinding
-    private lateinit var auth : FirebaseAuth
-    private lateinit var activityResultLauncher : ActivityResultLauncher<Intent> // activity launcher
+    private lateinit var binding: ActivitySignInBinding
+    private lateinit var currentUser: FirebaseUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        auth = Firebase.auth // Firebase auth
-        activityResultLauncher = openActivityResultLauncher() // activity launcher
 
         // 로그인 버튼 리스너 설정
         binding.signInButton.setOnClickListener {
@@ -50,27 +48,28 @@ class SignInActivity : AppCompatActivity() {
         // 회원가입 버튼 리스너 설정
         binding.signUpButton.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
-            activityResultLauncher.launch(intent) // 회원가입 액티비티 실행
+            startActivityForResult(intent, SIGN_UP)
         }
 
     }
 
     // ActivityResultLauncher 등록 및 초기화
-    private fun openActivityResultLauncher() : ActivityResultLauncher<Intent> {
-        val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result : ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // 회원가입 시에 입력한 이메일, 비밀번호 정보를 로그인 화면에 그대로 가져오기
-                binding.emailEdit.setText(result.data?.getStringExtra(EMAIL_KEY))
-                binding.pwEdit.setText(result.data?.getStringExtra(PASSWORD_KEY))
+    private fun openActivityResultLauncher(): ActivityResultLauncher<Intent> {
+        val resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    // 회원가입 시에 입력한 이메일, 비밀번호 정보를 로그인 화면에 그대로 가져오기
+                    binding.emailEdit.setText(result.data?.getStringExtra(EMAIL_KEY))
+                    binding.pwEdit.setText(result.data?.getStringExtra(PASSWORD_KEY))
+                }
             }
-        }
 
         return resultLauncher
     }
 
-    private fun signIn(email : String, password : String) {
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
-            val currentUser = auth.currentUser
+    private fun signIn(email: String, password: String) {
+        Firebase.auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
+            currentUser = Firebase.auth.currentUser!!
 
             if (task.isSuccessful) { // 로그인 성공
                 Log.d(TAG, "signInWithEmail : success")
@@ -83,6 +82,16 @@ class SignInActivity : AppCompatActivity() {
                 Log.w(TAG, "signInWithEmail : failure", task.exception)
                 Toast.makeText(this, "로그인 실패", Toast.LENGTH_SHORT).show() // 메시지 보여주기
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == SIGN_UP && resultCode == Activity.RESULT_OK) {
+            // 회원가입 시에 입력한 이메일, 비밀번호 정보를 로그인 화면에 그대로 가져오기
+            binding.emailEdit.setText(data?.getStringExtra(EMAIL_KEY))
+            binding.pwEdit.setText(data?.getStringExtra(PASSWORD_KEY))
         }
     }
 }

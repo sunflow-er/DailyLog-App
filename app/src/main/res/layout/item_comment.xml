@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:hint="ABC"
-        android:textSize="8sp"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="@id/comment_user_profile_image"
         app:layout_constraintStart_toStartOf="@id/comment_user_profile_image"
         app:layout_constraintTop_toBottomOf="@id/comment_user_profile_image"

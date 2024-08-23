@@ -2,7 +2,6 @@ package org.javaapp.dailylog.log
 
 import android.content.Context
 import android.os.Bundle
-import android.renderscript.Sampler.Value
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
@@ -29,14 +28,12 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.R
-import org.javaapp.dailylog.UserNameCallback
+import org.javaapp.dailylog.UserInfoCallback
 import org.javaapp.dailylog.databinding.FragmentCommentLogBinding
-import org.javaapp.dailylog.databinding.FragmentLogBinding
 import org.javaapp.dailylog.databinding.ItemCommentBinding
 import org.javaapp.dailylog.formatText
-import org.javaapp.dailylog.getUserName
-import java.time.LocalDateTime
-import java.util.Date
+import org.javaapp.dailylog.getUserInfo
+import org.javaapp.dailylog.user.User
 import java.util.UUID
 
 
@@ -69,7 +66,7 @@ class CommentLogFragment(private val logId : String) : Fragment() {
         val menuHost : MenuHost = requireActivity()
         val menuProvider = object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_comment, menu)
+                menuInflater.inflate(R.menu.menu_comment_log, menu)
             }
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
@@ -91,7 +88,7 @@ class CommentLogFragment(private val logId : String) : Fragment() {
         menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
 
         // 댓글 리사이클러뷰 설정
-        binding.commentRecyclerView.apply {
+        binding.commentLogRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = CommentAdapter(emptyList())
         }
@@ -123,7 +120,7 @@ class CommentLogFragment(private val logId : String) : Fragment() {
                         commentList.add(comment)
                     }
 
-                    binding.commentRecyclerView.adapter = CommentAdapter(commentList)
+                    binding.commentLogRecyclerView.adapter = CommentAdapter(commentList)
                 }
             }
 
@@ -133,7 +130,7 @@ class CommentLogFragment(private val logId : String) : Fragment() {
         })
 
         // 댓글 입력 버튼 리스너 설정
-        binding.commentSendButton.setOnClickListener {
+        binding.commentLogSendButton.setOnClickListener {
 
             val commentId = UUID.randomUUID().toString() // 현재 시간(나노초)을 기준으로 고유 아이디값 생성
             val timeStamp = System.currentTimeMillis().toString() // 타임스탬프
@@ -141,21 +138,21 @@ class CommentLogFragment(private val logId : String) : Fragment() {
             val comment = mutableMapOf<String, Any>()
             comment["id"] = commentId
             comment["userId"] = currentUser.uid
-            comment["comment"] = formatText(binding.commentTypeEdit.text.toString())
+            comment["comment"] = formatText(binding.commentLogTypeEdit.text.toString())
             comment["timeStamp"] = timeStamp
 
             database.child(Key.DB_COMMENTS).child(logId!!).child(commentId).setValue(comment)
 
             // EditText 내용 비우기
-            binding.commentTypeEdit.text.clear()
+            binding.commentLogTypeEdit.text.clear()
 
             // 키보드 내리기
             val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(binding.commentTypeEdit.windowToken, 0) // commentTypeEdit 윈도우의 키보드를 숨긴다.
+            imm.hideSoftInputFromWindow(binding.commentLogTypeEdit.windowToken, 0) // commentTypeEdit 윈도우의 키보드를 숨긴다.
 
             // 키보드가 완전히 내려간 후 스크롤뷰 맨 아래로 이동
-            binding.commentTypeEdit.postDelayed({
-                binding.commentNestedScrollView.fullScroll(View.FOCUS_DOWN) // 주어진 방향으로 스크롤 뷰를 완전히 스크롤
+            binding.commentLogTypeEdit.postDelayed({
+                binding.commentLogNestedScrollView.fullScroll(View.FOCUS_DOWN) // 주어진 방향으로 스크롤 뷰를 완전히 스크롤
             }, 500) // 500ms 지연
         }
     }
@@ -171,16 +168,16 @@ class CommentLogFragment(private val logId : String) : Fragment() {
                 }
                 binding.commentLinearLayout.gravity = Gravity.END // 오른쪽 배치
             } else { // 다른 사람이 쓴 댓글일 때
-                binding.commentUserProfileImage.apply {
-                    visibility = View.VISIBLE
-                    setImageResource(R.drawable.baseline_account_box_24)
-                }
-                getUserName(database, comment.userId!!, object : UserNameCallback {
-                    override fun onUserNameRetrieved(userName: String?) {
+                // 댓글 작성자 이름, 프로필 이미지 가져오기
+                getUserInfo(database, comment.userId!!, object : UserInfoCallback {
+                    override fun onUserInfoRetrieved(userInfo: User) {
                         binding.commentUserNameText.apply {
                             visibility = View.VISIBLE
-                            text = userName
+                            text = userInfo.name
                         }
+
+                        binding.commentUserProfileImage.visibility = View.VISIBLE
+                        Glide.with(requireContext()).load(userInfo.profileImage).into(binding.commentUserProfileImage)
                     }
                 })
                 binding.commentContentText.apply {
@@ -211,28 +208,36 @@ class CommentLogFragment(private val logId : String) : Fragment() {
     }
 
     private fun bindLog(log : Log) {
-        binding.commentUserProfileImage.setImageResource(R.drawable.baseline_account_box_24)
-        getUserName(database, log.userId!!, object : UserNameCallback {
-            override fun onUserNameRetrieved(userName: String?) {
-                binding.commentUserNameText.text = userName
+        // 로그 작성자 이름, 프로필 이미지 가져오기
+        getUserInfo(database, log.userId!!, object : UserInfoCallback {
+            override fun onUserInfoRetrieved(userInfo: User) {
+                binding.commentLogUserNameText.text = userInfo.name
+                Glide.with(requireContext()).load(userInfo.profileImage).into(binding.commentLogUserProfileImage)
             }
         })
-        binding.commentDateText.text = log.date
-        binding.commentTimeText.text = log.time
+
+        binding.commentLogDateText.text = log.date
+        binding.commentLogTimeText.text = log.time
 
         if (log.image.isNullOrBlank()) { // 사진을 첨부하지 않았으면
-            binding.commentContentImage.isVisible = false // 보이지 않게
+            binding.commentLogContentImage.isVisible = false // 보이지 않게
         } else { // 첨부했으면
-            binding.commentContentImage.isVisible = true
+            binding.commentLogContentImage.isVisible = true
 
             // 이미지 업로드
             Glide.with(requireContext())
                 .load(log.image.toUri())
-                .into(binding.commentContentImage)
-
+                .into(binding.commentLogContentImage)
         }
-
-        binding.commentContentText.text = log.text
+        
+        if (log.text.isNullOrBlank()) {
+            binding.commentLogContentText.isVisible = false
+        } else {
+            binding.commentLogContentText.apply {
+                isVisible = true
+                text = log.text
+            }
+        }
     }
 
 

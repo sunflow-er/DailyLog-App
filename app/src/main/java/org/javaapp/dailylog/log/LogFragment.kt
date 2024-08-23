@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserInfo
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -28,10 +29,11 @@ import org.javaapp.dailylog.Key
 import org.javaapp.dailylog.OnAddSelectedListener
 import org.javaapp.dailylog.OnLogSelectedListener
 import org.javaapp.dailylog.R
-import org.javaapp.dailylog.UserNameCallback
+import org.javaapp.dailylog.UserInfoCallback
 import org.javaapp.dailylog.databinding.FragmentLogBinding
 import org.javaapp.dailylog.databinding.ItemLogBinding
-import org.javaapp.dailylog.getUserName
+import org.javaapp.dailylog.getUserInfo
+import org.javaapp.dailylog.user.User
 
 
 class LogFragment : Fragment() {
@@ -137,14 +139,14 @@ class LogFragment : Fragment() {
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(log: Log) {
-            // 바인딩
-            binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24) // 프로필 이미지
-
-            getUserName(database ,log.userId!!, object : UserNameCallback { // 사용자 이름
-                override fun onUserNameRetrieved(userName: String?) {
-                    binding.logUserNameText.text = userName
+            // 로그 작성자 이름, 프로필 이미지 가져오기
+            getUserInfo(database, log.userId!!, object : UserInfoCallback {
+                override fun onUserInfoRetrieved(userInfo: User) {
+                    binding.logUserNameText.text = userInfo.name // 로그 작성자 이름
+                    Glide.with(requireContext()).load(userInfo.profileImage?.toUri()).into(binding.logUserProfileImage) // 로그 작성자 프로필 이미지
                 }
             })
+            
             binding.logDateText.setText(log.date) // 게시 날짜
             binding.logTimeText.setText(log.time) // 게시 시간
 
