@@ -171,7 +171,7 @@ class LogFragment : Fragment() {
             
             // 이벤트 리스너 설정
             binding.root.setOnClickListener {// 로그 화면(전체) 클릭 시
-                onLogSelectedListener?.onLogSelected(log.id) // CommentLogFragment로 이동
+                onLogSelectedListener?.onLogSelected(log.id!!) // CommentLogFragment로 이동
             }
 
             binding.logLikeButton.setOnClickListener {// 하트 버튼 클릭 시
@@ -181,7 +181,7 @@ class LogFragment : Fragment() {
             }
 
             binding.logCommentButton.setOnClickListener {// 댓글 버튼 클릭 시
-                onLogSelectedListener?.onLogSelected(log.id) // CommentLogFragment로 이동
+                onLogSelectedListener?.onLogSelected(log.id!!) // CommentLogFragment로 이동
             }
 
         }

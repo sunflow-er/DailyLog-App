@@ -40,7 +40,7 @@ import java.util.Date
 import java.util.UUID
 
 
-class CommentLogFragment(private val logId : String?) : Fragment() {
+class CommentLogFragment(private val logId : String) : Fragment() {
     private lateinit var binding : FragmentCommentLogBinding
     private lateinit var currentUser : FirebaseUser
     private lateinit var database : DatabaseReference
@@ -71,7 +71,6 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_comment, menu)
             }
-
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.modify_my_log -> {
@@ -79,7 +78,8 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
                         true
                     }
                     R.id.delete_my_log -> {
-                        database.child(Key.DB_LOGS).child(logId!!).removeValue() // 데이터 삭제
+                        database.child(Key.DB_LOGS).child(logId).removeValue() // 로그 삭제
+                        database.child(Key.DB_COMMENTS).child(logId).removeValue() // 댓글 삭제
 
                         requireActivity().supportFragmentManager.popBackStack()  // 프래그먼트 종료
                         true
@@ -97,10 +97,12 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
         }
 
         // 로그 정보 가져오기
-        database.child(Key.DB_LOGS).child(logId!!).addListenerForSingleValueEvent(object : ValueEventListener {
+        database.child(Key.DB_LOGS).child(logId).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val log = snapshot.getValue(Log::class.java)
-                bindLog(log!!)
+                if (isAdded) { // 프래그먼트가 현재 액티비티에 추가(연결)되었는지 확인, 프래그먼트가 활성 상태인지 확인
+                    val log = snapshot.getValue(Log::class.java)
+                    bindLog(log!!)
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -111,16 +113,18 @@ class CommentLogFragment(private val logId : String?) : Fragment() {
         // 댓글 정보 가져오기
         database.child(Key.DB_COMMENTS).child(logId).orderByChild("timeStamp").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val commentList = mutableListOf<Comment>()
+                if (isAdded) { // 프래그먼트가 활성 상태인지 확인
+                    val commentList = mutableListOf<Comment>()
 
-                snapshot.children.forEach {
-                    val comment = it.getValue(Comment::class.java)
-                    comment ?: return
+                    snapshot.children.forEach {
+                        val comment = it.getValue(Comment::class.java)
+                        comment ?: return
 
-                    commentList.add(comment)
+                        commentList.add(comment)
+                    }
+
+                    binding.commentRecyclerView.adapter = CommentAdapter(commentList)
                 }
-
-                binding.commentRecyclerView.adapter = CommentAdapter(commentList)
             }
 
             override fun onCancelled(error: DatabaseError) {

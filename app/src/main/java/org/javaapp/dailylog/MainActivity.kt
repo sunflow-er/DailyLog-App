@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity(), OnAddSelectedListener, OnLogSelectedLi
         }
     }
 
-    override fun onLogSelected(logId : String?) {
+    override fun onLogSelected(logId : String) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, CommentLogFragment(logId))
             .addToBackStack(null)

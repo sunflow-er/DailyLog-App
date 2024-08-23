@@ -78,8 +78,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                tools:src="@drawable/baseline_image_48"
                 android:background="@drawable/round_rect_background"
-                android:src="@drawable/baseline_home_filled_100"
                 app:layout_constraintTop_toBottomOf="@id/line_1" />
 
             <TextView

@@ -181,7 +181,7 @@ class MyFragment : Fragment() {
 
             // 리스너 설정
             binding.root.setOnClickListener {
-                onLogSelectedListener?.onLogSelected(log.id)
+                onLogSelectedListener?.onLogSelected(log.id!!)
             }
         }
     }
