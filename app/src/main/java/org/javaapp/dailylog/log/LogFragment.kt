@@ -99,10 +99,10 @@ class LogFragment : Fragment() {
             getUserInfo(database, log.userId!!, object : UserInfoCallback {
                 override fun onUserInfoRetrieved(userInfo: User) {
                     binding.logUserNameText.text = userInfo.name // 로그 작성자 이름
-                    if (userInfo.profileImage.isNullOrBlank()) { // 프로필 이미지
+                    if (userInfo.profileImage.isNullOrBlank()) {
                         binding.logUserProfileImage.setImageResource(R.drawable.baseline_account_box_24)
                     } else {
-                        Glide.with(requireContext()).load(userInfo.profileImage.toUri()).into(binding.logUserProfileImage) // 로그 작성자 프로필 이미지
+                        Glide.with(requireContext()).load(userInfo.profileImage).into(binding.logUserProfileImage) // 로그 작성자 프로필 이미지
                     }
 
                 }

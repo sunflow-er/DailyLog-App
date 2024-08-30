@@ -3,12 +3,8 @@ package org.javaapp.dailylog.my
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -19,8 +15,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -44,9 +38,7 @@ import org.javaapp.dailylog.SignInActivity
 import org.javaapp.dailylog.databinding.FragmentMyBinding
 import org.javaapp.dailylog.databinding.ItemMyBinding
 import org.javaapp.dailylog.log.Log
-import org.javaapp.dailylog.log.LogFragment
 import org.javaapp.dailylog.user.User
-import java.io.File
 
 private const val PICK_IMAGE_REQUEST = 1
 
@@ -54,8 +46,8 @@ class MyFragment : Fragment() {
     private lateinit var binding : FragmentMyBinding
     private lateinit var currentUser : FirebaseUser
     private lateinit var database : DatabaseReference
-    private lateinit var profileImage : ImageView
-    private var imageUri : Uri? = null // 프로필 이미지의 URI
+    private lateinit var profileImageView : ImageView
+    private var profileImageUri : String? = "" // 프로필 이미지의 URI
 
     private var onAddSelectedListener: OnAddSelectedListener? = null
     private var onLogSelectedListener : OnLogSelectedListener? = null
@@ -93,74 +85,19 @@ class MyFragment : Fragment() {
             adapter = MyLogAdapter(emptyList())
         }
 
-        // 앱바 게시글 추가 메뉴 설정
-        val menuHost : MenuHost = requireActivity()
-        val menuProvider = object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_my, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when(menuItem.itemId) {
-                    R.id.add_log -> {
-                        onAddSelectedListener?.onAddSelected()
-                        true
-                    }
-                    else -> false
-                }
-            }
-
-        }
-        menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
-
-
-        // 내 정보 가져와서 띄우기
-        database.child(Key.DB_USERS).child(currentUser.uid).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val user = snapshot.getValue(User::class.java)
-                user ?: return
-
-                imageUri = user.profileImage?.toUri()
-                Glide.with(requireContext()).load(user.profileImage).into(binding.myProfileImage) // 프로필 이미지
-                binding.myNameText.text = user.name
-                binding.myStatusMessageText.text = user.statusMessage
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-
-        })
-
-        // 내 로그 가져와서 띄우기
-        // equalTo 메서드는 orderByChild 메서드와 함께 사용해야 한다.
-        database.child(Key.DB_LOGS).orderByChild("userId").equalTo(currentUser.uid).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val myLogList = mutableListOf<Log>()
-
-                snapshot.children.forEach {
-                    val myLog = it.getValue(Log::class.java)
-                    myLog ?: return
-
-                    myLogList.add(myLog)
-                }
-
-                // 생성 시간을 기준으로 정렬
-                myLogList.sortByDescending { it.timeStamp }
-
-                binding.myLogRecyclerView.adapter = MyLogAdapter(myLogList)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })
-
         // 내 정보 수정 버튼 리스너 설정
         binding.myEditButton.setOnClickListener {
             showEditProfileDialog()
         }
 
+
+        setupAppBarMenu() // 앱바 게시글 추가 메뉴 설정
+
+
+        fetchMyInfo() // 내 정보 가져와서 띄우기
+
+
+        fetchMyLogList() // 내 로그 가져와서 띄우기
     }
 
     override fun onDetach() {
@@ -172,9 +109,9 @@ class MyFragment : Fragment() {
     private inner class MyLogHolder(private val binding : ItemMyBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(log : Log) {
-            binding.myLogDateText.text = log.date
-            binding.myLogTimeText.text = log.time
-            if (log.image.isNullOrBlank()) {
+            binding.myLogDateText.text = log.date // 날짜
+            binding.myLogTimeText.text = log.time // 시간
+            if (log.image.isNullOrBlank()) { // 이미지
                 binding.myLogContentImage.isVisible = false
             } else {
                 binding.myLogContentImage.isVisible = true
@@ -184,7 +121,7 @@ class MyFragment : Fragment() {
                     .load(log.image)
                     .into(binding.myLogContentImage)
             }
-            if (log.text.isNullOrBlank()) {
+            if (log.text.isNullOrBlank()) { // 텍스트
                 binding.myLogContentText.isVisible = false
             } else {
                 binding.myLogContentText.apply {
@@ -222,21 +159,95 @@ class MyFragment : Fragment() {
         }
     }
 
+    private fun setupAppBarMenu() {
+        val menuHost : MenuHost = requireActivity()
+        val menuProvider = object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_my, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when(menuItem.itemId) {
+                    R.id.add_log -> {
+                        onAddSelectedListener?.onAddSelected()
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+        }
+        menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
+    }
+
+    private fun fetchMyInfo() {
+        database.child(Key.DB_USERS).child(currentUser.uid).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(User::class.java)
+                user ?: return
+
+                if (user.profileImage.isNullOrBlank()) {
+                    binding.myProfileImage.setImageResource(R.drawable.baseline_account_box_24)
+                    profileImageUri = ""
+                } else {
+                    Glide.with(requireContext()).load(user.profileImage).into(binding.myProfileImage) // 프로필 이미지
+                    profileImageUri = user.profileImage
+                }
+                binding.myNameText.text = user.name
+                binding.myStatusMessageText.text = user.statusMessage
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
+    }
+
+    private fun fetchMyLogList() {
+        // equalTo 메서드는 orderByChild 메서드와 함께 사용해야 한다.
+        database.child(Key.DB_LOGS).orderByChild("userId").equalTo(currentUser.uid).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val myLogList = mutableListOf<Log>()
+
+                snapshot.children.forEach {
+                    val myLog = it.getValue(Log::class.java)
+                    myLog ?: return
+
+                    myLogList.add(myLog)
+                }
+
+                // 생성 시간을 기준으로 정렬
+                myLogList.sortByDescending { it.timeStamp }
+
+                binding.myLogRecyclerView.adapter = MyLogAdapter(myLogList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+    }
+
     private fun showEditProfileDialog() {
         // dialog 생성에 필요한 뷰 정보들
         val dialog = LayoutInflater.from(context).inflate(R.layout.dialog_edit_my, null)
-        profileImage = dialog.findViewById<ImageView>(R.id.edit_profile_image)
+        profileImageView = dialog.findViewById<ImageView>(R.id.edit_profile_image)
         val nameEdit = dialog.findViewById<EditText>(R.id.edit_name_edit)
         val statusMessageEdit = dialog.findViewById<EditText>(R.id.edit_status_message_edit)
         val signOutButton = dialog.findViewById<Button>(R.id.edit_sign_out_button)
 
         // 현재 데이터를 기본값으로 세팅
-        Glide.with(this).load(imageUri).into(profileImage)
-        nameEdit.setText(binding.myNameText.text)
-        statusMessageEdit.setText(binding.myStatusMessageText.text)
+        if (profileImageUri.isNullOrBlank()) { // 프로필 이미지
+            profileImageView.setImageResource(R.drawable.baseline_account_box_24)
+        } else {
+            Glide.with(this).load(profileImageUri).into(profileImageView)
+        }
+        nameEdit.setText(binding.myNameText.text) // 이름
+        statusMessageEdit.setText(binding.myStatusMessageText.text) // 상태메시지
 
         // 프로필 이미지 선택 리스너 설정
-        profileImage.setOnClickListener {
+        profileImageView.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(intent, PICK_IMAGE_REQUEST)
         }
@@ -259,7 +270,7 @@ class MyFragment : Fragment() {
                 // 수정한 정보 가져오기
                 val newName = nameEdit.text.toString()
                 val newStatusMessage = statusMessageEdit.text.toString()
-                val newProfileImage = imageUri.toString()
+                val newProfileImage = profileImageUri ?: ""
 
                 // 파이어베이스 데이터베이스 유저 정보에 반영, 업데이트
                 val userInfoUpdate = mapOf(
@@ -283,10 +294,8 @@ class MyFragment : Fragment() {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
-                imageUri = uri
-
-                // 선택된 이미지 띄우기
-                Glide.with(this).load(uri).into(profileImage)
+                profileImageUri = uri.toString()
+                Glide.with(this).load(uri).into(profileImageView) // 선택된 이미지 띄우기
             }
         }
     }

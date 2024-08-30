@@ -20,7 +20,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@drawable/round_rect_background"
-            tools:src="@drawable/baseline_account_box_24"
+            android:src="@drawable/baseline_account_box_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

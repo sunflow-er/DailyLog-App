@@ -52,25 +52,19 @@ class UserFragment : Fragment() {
             adapter = UserAdapter(emptyList())
         }
 
-
         fetchUserList() // 파이어베이스 데이터베이스 사용자 리스트 정보 가져오기 (한 번만 가져오기)
     }
 
     private inner class UserHolder(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(user : User) {
-            // 프로필 이미지
             if (user.profileImage.isNullOrBlank()) {
                 binding.userProfileImage.setImageResource(R.drawable.baseline_account_box_24)
             } else {
                 Glide.with(requireContext()).load(user.profileImage).into(binding.userProfileImage)
             }
-            
-            // 이름
-            binding.userNameText.text = user.name
-            
-            // 상태메시지
-            if (user.statusMessage.isNullOrBlank()) {
+            binding.userNameText.text = user.name // 이름
+            if (user.statusMessage.isNullOrBlank()) { // 상태메시지
                 binding.userStatusMessageText.visibility = View.INVISIBLE
             } else {
                 binding.userStatusMessageText.apply {
