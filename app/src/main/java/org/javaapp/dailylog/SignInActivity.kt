@@ -54,9 +54,8 @@ class SignInActivity : AppCompatActivity() {
 
     private fun signIn(email: String, password: String) {
         Firebase.auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
-            currentUser = Firebase.auth.currentUser!!
-
             if (task.isSuccessful) { // 로그인 성공
+                currentUser = Firebase.auth.currentUser!!
                 // 메인 화면으로 이동
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
