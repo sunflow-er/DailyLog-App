@@ -37,10 +37,10 @@ import org.javaapp.dailylog.user.User
 import java.util.UUID
 
 
-class CommentLogFragment(private val logId : String) : Fragment() {
-    private lateinit var binding : FragmentCommentLogBinding
-    private lateinit var currentUser : FirebaseUser
-    private lateinit var database : DatabaseReference
+class CommentLogFragment(private val logId: String) : Fragment() {
+    private lateinit var binding: FragmentCommentLogBinding
+    private lateinit var currentUser: FirebaseUser
+    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,17 +63,19 @@ class CommentLogFragment(private val logId : String) : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // 앱바 메뉴 인플레이트 및 리스너 설정
-        val menuHost : MenuHost = requireActivity()
+        val menuHost: MenuHost = requireActivity()
         val menuProvider = object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_comment_log, menu)
             }
+
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.modify_my_log -> {
                         // TODO 로그 내용 수정
                         true
                     }
+
                     R.id.delete_my_log -> {
                         database.child(Key.DB_LOGS).child(logId).removeValue() // 로그 삭제
                         database.child(Key.DB_COMMENTS).child(logId).removeValue() // 댓글 삭제
@@ -81,6 +83,7 @@ class CommentLogFragment(private val logId : String) : Fragment() {
                         requireActivity().supportFragmentManager.popBackStack()  // 프래그먼트 종료
                         true
                     }
+
                     else -> false
                 }
             }
@@ -98,6 +101,7 @@ class CommentLogFragment(private val logId : String) : Fragment() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (isAdded) { // 프래그먼트가 현재 액티비티에 추가(연결)되었는지 확인, 프래그먼트가 활성 상태인지 확인
                     val log = snapshot.getValue(Log::class.java)
+
                     bindLog(log!!)
                 }
             }
@@ -106,28 +110,31 @@ class CommentLogFragment(private val logId : String) : Fragment() {
             }
 
         })
-        
+
         // 댓글 정보 가져오기
-        database.child(Key.DB_COMMENTS).child(logId).orderByChild("timeStamp").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (isAdded) { // 프래그먼트가 활성 상태인지 확인
-                    val commentList = mutableListOf<Comment>()
+        database.child(Key.DB_COMMENTS).child(logId).orderByChild("timeStamp")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (isAdded) { // 프래그먼트가 활성 상태인지 확인
+                        val commentList = mutableListOf<Comment>()
 
-                    snapshot.children.forEach {
-                        val comment = it.getValue(Comment::class.java)
-                        comment ?: return
+                        snapshot.children.forEach {
+                            val comment = it.getValue(Comment::class.java)
+                            comment ?: return
 
-                        commentList.add(comment)
+                            commentList.add(comment)
+                        }
+
+
+                        binding.commentLogRecyclerView.adapter = CommentAdapter(commentList)
+
                     }
-
-                    binding.commentLogRecyclerView.adapter = CommentAdapter(commentList)
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-            }
+                override fun onCancelled(error: DatabaseError) {
+                }
 
-        })
+            })
 
         // 댓글 입력 버튼 리스너 설정
         binding.commentLogSendButton.setOnClickListener {
@@ -147,8 +154,12 @@ class CommentLogFragment(private val logId : String) : Fragment() {
             binding.commentLogTypeEdit.text.clear()
 
             // 키보드 내리기
-            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(binding.commentLogTypeEdit.windowToken, 0) // commentTypeEdit 윈도우의 키보드를 숨긴다.
+            val imm =
+                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(
+                binding.commentLogTypeEdit.windowToken,
+                0
+            ) // commentTypeEdit 윈도우의 키보드를 숨긴다.
 
             // 키보드가 완전히 내려간 후 스크롤뷰 맨 아래로 이동
             binding.commentLogTypeEdit.postDelayed({
@@ -157,8 +168,9 @@ class CommentLogFragment(private val logId : String) : Fragment() {
         }
     }
 
-    private inner class CommentHolder(private val binding : ItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(comment : Comment) { // 내가 쓴 댓글일 때
+    private inner class CommentHolder(private val binding: ItemCommentBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(comment: Comment) { // 내가 쓴 댓글일 때
             if (comment.userId == currentUser.uid) {
                 binding.commentUserProfileImage.visibility = View.INVISIBLE // 프로필 이미지 화면에서 지움
                 binding.commentUserNameText.visibility = View.INVISIBLE // 이름 화면에서 지움
@@ -177,7 +189,8 @@ class CommentLogFragment(private val logId : String) : Fragment() {
                         }
 
                         binding.commentUserProfileImage.visibility = View.VISIBLE
-                        Glide.with(requireContext()).load(userInfo.profileImage).into(binding.commentUserProfileImage)
+                        Glide.with(requireContext()).load(userInfo.profileImage)
+                            .into(binding.commentUserProfileImage)
                     }
                 })
                 binding.commentContentText.apply {
@@ -190,7 +203,8 @@ class CommentLogFragment(private val logId : String) : Fragment() {
         }
     }
 
-    private inner class CommentAdapter(private val commentList : List<Comment>) : RecyclerView.Adapter<CommentHolder>() {
+    private inner class CommentAdapter(private val commentList: List<Comment>) :
+        RecyclerView.Adapter<CommentHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentHolder {
             val binding = ItemCommentBinding.inflate(layoutInflater, parent, false)
 
@@ -207,12 +221,13 @@ class CommentLogFragment(private val logId : String) : Fragment() {
 
     }
 
-    private fun bindLog(log : Log) {
+    private fun bindLog(log: Log) {
         // 로그 작성자 이름, 프로필 이미지 가져오기
         getUserInfo(database, log.userId!!, object : UserInfoCallback {
             override fun onUserInfoRetrieved(userInfo: User) {
                 binding.commentLogUserNameText.text = userInfo.name
-                Glide.with(requireContext()).load(userInfo.profileImage).into(binding.commentLogUserProfileImage)
+                Glide.with(requireContext()).load(userInfo.profileImage)
+                    .into(binding.commentLogUserProfileImage)
             }
         })
 
@@ -229,7 +244,7 @@ class CommentLogFragment(private val logId : String) : Fragment() {
                 .load(log.image.toUri())
                 .into(binding.commentLogContentImage)
         }
-        
+
         if (log.text.isNullOrBlank()) {
             binding.commentLogContentText.isVisible = false
         } else {
@@ -239,7 +254,6 @@ class CommentLogFragment(private val logId : String) : Fragment() {
             }
         }
     }
-
 
 
 }

@@ -16,7 +16,7 @@ import org.javaapp.dailylog.user.UserFragment
 
 class MainActivity : AppCompatActivity(), OnAddSelectedListener, OnLogSelectedListener {
     private lateinit var binding : ActivityMainBinding
-    private lateinit var auth: FirebaseAuth // firebase auth
+    private var currentUser: FirebaseUser? = null
 
     private lateinit var userFragment: UserFragment
     private lateinit var logFragment: LogFragment
@@ -27,18 +27,15 @@ class MainActivity : AppCompatActivity(), OnAddSelectedListener, OnLogSelectedLi
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        auth = Firebase.auth // FirebaseAuth 객체의 공유 인스턴스 가져오기
-
         // 프래그먼트 객체 초기화(생성)
         userFragment = UserFragment.newInstance()
         logFragment = LogFragment.newInstance()
         myFragment = MyFragment.newInstance()
 
-        // 프래그먼트 컨테이너 초기화(
-        // 설정)
+        // 프래그먼트 컨테이너 초기화(설정)
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) // 현재 프래그먼트 정보 가져오기
         if (currentFragment == null) { // 현재 프래그먼트가 없다면
-            val baseFragment = userFragment // WithFragment를 기본 프래그먼트로 설정
+            val baseFragment = logFragment // LogFragment를 기본 프래그먼트로 설정
             supportFragmentManager.beginTransaction().add(R.id.fragment_container, baseFragment).commit() // 기본 프래그먼트 띄우기
         }
 
@@ -66,10 +63,8 @@ class MainActivity : AppCompatActivity(), OnAddSelectedListener, OnLogSelectedLi
         super.onStart()
 
         // 사용자가 현재 로그인되어 있는지 확인
-        val currentUser : FirebaseUser? = auth.currentUser // 현재 사용자
-        if (currentUser != null) { // 로그인 되어있으면
-            // reload() // UI 업데이트
-        } else { // 로그인 되어있지 않으면
+        currentUser = Firebase.auth.currentUser
+        if (currentUser == null) { // 로그인 되어 있지 않으면
             // 로그인 화면으로 이동
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)

@@ -39,7 +39,7 @@ class SignInActivity : AppCompatActivity() {
             val password = binding.pwEdit.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                signIn(email, password)
+                signIn(email, password) // 로그인
             } else {
                 Toast.makeText(this, "잘못된 이메일/비밀번호 형식", Toast.LENGTH_SHORT).show()
             }
@@ -47,24 +47,9 @@ class SignInActivity : AppCompatActivity() {
 
         // 회원가입 버튼 리스너 설정
         binding.signUpButton.setOnClickListener {
-            val intent = Intent(this, SignUpActivity::class.java)
-            startActivityForResult(intent, SIGN_UP)
+            signUp() // 회원가입
         }
 
-    }
-
-    // ActivityResultLauncher 등록 및 초기화
-    private fun openActivityResultLauncher(): ActivityResultLauncher<Intent> {
-        val resultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    // 회원가입 시에 입력한 이메일, 비밀번호 정보를 로그인 화면에 그대로 가져오기
-                    binding.emailEdit.setText(result.data?.getStringExtra(EMAIL_KEY))
-                    binding.pwEdit.setText(result.data?.getStringExtra(PASSWORD_KEY))
-                }
-            }
-
-        return resultLauncher
     }
 
     private fun signIn(email: String, password: String) {
@@ -72,17 +57,19 @@ class SignInActivity : AppCompatActivity() {
             currentUser = Firebase.auth.currentUser!!
 
             if (task.isSuccessful) { // 로그인 성공
-                Log.d(TAG, "signInWithEmail : success")
-
                 // 메인 화면으로 이동
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
-
+                finish() // 로그인 액티비티 종료
             } else { // 로그인에 실패할 경우
-                Log.w(TAG, "signInWithEmail : failure", task.exception)
                 Toast.makeText(this, "로그인 실패", Toast.LENGTH_SHORT).show() // 메시지 보여주기
             }
         }
+    }
+
+    private fun signUp() {
+        val intent = Intent(this, SignUpActivity::class.java)
+        startActivityForResult(intent, SIGN_UP)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.ActivitySignUpBinding
@@ -20,6 +21,7 @@ private const val NAME_KEY = "name"
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpBinding
     private lateinit var currentUser : FirebaseUser
+    private lateinit var database : DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,9 +44,8 @@ class SignUpActivity : AppCompatActivity() {
     private fun signUp(name : String, email : String, password : String) {
         Firebase.auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) { // 계정 생성에 성공, 자동 로그인
-                Log.d(TAG, "createUserWithEmail : success")
-
-                currentUser = Firebase.auth.currentUser!!
+                currentUser = Firebase.auth.currentUser!! // 현재 사용자 계정
+                database = Firebase.database(Key.DB_URL).reference // 데이터베이스
 
                 // 회원가입 완료 시 해당 계정에 대한 정보를 firebase realtime database에 생성 및 저장
                 val user = mutableMapOf<String, Any>() // 사용자 정보를 저장할 맵 생성
@@ -53,7 +54,7 @@ class SignUpActivity : AppCompatActivity() {
                 user["statusMessage"] = ""
                 user["profileImage"] = ""
 
-                Firebase.database(Key.DB_URL).reference // 파이어베이스 데이터베이스에 사용자 정보를 업데이트
+                database // 파이어베이스 데이터베이스에 사용자 정보를 업데이트
                     .child(Key.DB_USERS)
                     .child(currentUser.uid)
                     .updateChildren(user)
@@ -70,7 +71,6 @@ class SignUpActivity : AppCompatActivity() {
                 finish()
                 
             } else {
-                Log.w(TAG, "createUserWithEmail : failure", task.exception)
                 Toast.makeText(this, "회원가입 실패", Toast.LENGTH_SHORT).show()
             }
         }
