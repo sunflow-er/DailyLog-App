@@ -31,7 +31,6 @@ import java.util.UUID
 private const val PICK_IMAGE_REQUEST = 1
 
 class AddLogFragment : Fragment() {
-
     private lateinit var binding : FragmentAddLogBinding
     private lateinit var currentUser : FirebaseUser // user
     private lateinit var database : DatabaseReference // database
@@ -59,7 +58,20 @@ class AddLogFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 앱바 메뉴 인플레이트 및 리스너 설정
+        setupAppBarMenu() // 앱바 메뉴 인플레이트 및 리스너 설정
+
+        // 이미지 추가하기
+        binding.addImage.setOnClickListener {
+            addImage() // 갤러리에서 이미지 선택하여 추가
+        }
+
+        // 업로드 버튼 리스너 설정
+        binding.addButton.setOnClickListener {
+            uploadLog() // 작성한 로그 업로드
+        }
+    }
+
+    private fun setupAppBarMenu() {
         val menuHost : MenuHost = requireActivity()
         val menuProvider = object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -77,51 +89,44 @@ class AddLogFragment : Fragment() {
             }
         }
         menuHost.addMenuProvider(menuProvider, viewLifecycleOwner)
-
-        // 이미지 추가하기
-        binding.addImage.setOnClickListener {
-            openGallery() // 갤러리 열기
-        }
-
-        // 업로드 버튼 리스너 설정
-        binding.addButton.setOnClickListener {
-            formattedText = formatText(binding.addTextEdit.text.toString())
-
-            if (imageUri == null && formattedText.isNullOrBlank()) {
-                Toast.makeText(requireContext(), "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
-            } else {
-                val logId = UUID.randomUUID().toString() // 로그 아이디
-                val timeStamp = System.currentTimeMillis().toString()
-                val (date, time) = formatDateTimeNow() // 포맷팅된 현재 날짜 및 시간
-
-                // 저장할 로그 정보
-                val log = mutableMapOf<String, Any>()
-                log["id"] = logId
-                log["userId"] = currentUser.uid
-                log["date"] = date
-                log["time"] = time
-                log["text"] = formattedText
-                log["image"] = imageUri?.toString() ?: ""
-                log["likeCount"] = 0
-                log["commentCount"] = 0
-                log["timeStamp"] = timeStamp
-
-                // 파이어베이스 데이터베이스에 로그 정보 저장
-                database
-                    .child(Key.DB_LOGS)
-                    .child(logId)
-                    .setValue(log)
-
-                // 프래그먼트 종료
-                requireActivity().supportFragmentManager.popBackStack()
-            }
-        }
     }
 
-    // 갤러리 열기
-    private fun openGallery() {
+    private fun addImage() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, PICK_IMAGE_REQUEST) // 갤러리 열기
+    }
+
+    private fun uploadLog() {
+        formattedText = formatText(binding.addTextEdit.text.toString())
+
+        if (imageUri == null && formattedText.isNullOrBlank()) {
+            Toast.makeText(requireContext(), "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
+        } else {
+            val logId = UUID.randomUUID().toString() // 로그 아이디
+            val (date, time) = formatDateTimeNow() // 포맷팅된 현재 날짜 및 시간
+            val timeStamp = System.currentTimeMillis().toString() // 타임스탬프
+
+            // 저장할 로그 정보
+            val log = mutableMapOf<String, Any>()
+            log["id"] = logId
+            log["userId"] = currentUser.uid
+            log["date"] = date
+            log["time"] = time
+            log["text"] = formattedText
+            log["image"] = imageUri?.toString() ?: ""
+            log["likeCount"] = 0
+            log["commentCount"] = 0
+            log["timeStamp"] = timeStamp
+
+            // 파이어베이스 데이터베이스에 로그 정보 저장
+            database
+                .child(Key.DB_LOGS)
+                .child(logId)
+                .setValue(log)
+
+            // 프래그먼트 종료
+            requireActivity().supportFragmentManager.popBackStack()
+        }
     }
 
     // 갤러리에서 선택한 이미지 처리
@@ -131,18 +136,10 @@ class AddLogFragment : Fragment() {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             data?.data?.let { uri ->
                 imageUri = uri
-                loadImageFromUri(uri)
+                Glide.with(this) // Context
+                    .load(uri) // URI
+                    .into(binding.addImage) // View
             }
         }
     }
-    
-    // 선택한 이미지의 URI를 ImageView에 업로드
-    private fun loadImageFromUri(uri : Uri) {
-        Glide.with(this) // Context
-            .load(uri) // URI
-            .into(binding.addImage) // View
-    }
-
-
-    
 }

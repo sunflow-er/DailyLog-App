@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -21,9 +24,14 @@ import org.javaapp.dailylog.databinding.ItemUserBinding
 
 class UserFragment : Fragment() {
     private lateinit var binding: FragmentUserBinding
+    private lateinit var currentUser : FirebaseUser
+    private lateinit var database : DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        currentUser = Firebase.auth.currentUser!!
+        database = Firebase.database(Key.DB_URL).reference
     }
 
     override fun onCreateView(
@@ -41,39 +49,27 @@ class UserFragment : Fragment() {
 
         binding.userRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            // adapter = UserAdapter(emptyList())
+            adapter = UserAdapter(emptyList())
         }
 
-        // 파이어베이스 데이터베이스 사용자 리스트 정보 가져오기 (한 번만 가져오기)
-        Firebase.database.reference.child(Key.DB_USERS).addListenerForSingleValueEvent( object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
 
-                val userList = mutableListOf<User>() // 화면에 보여줄 사용자를 담을 리스트
-                val currentUserId = Firebase.auth.currentUser?.uid ?: "" // 현재 사용자의 아이디
-
-                snapshot.children.forEach {
-                    val user = it.getValue(User::class.java)
-                    user ?: return
-
-                    if(user.id != currentUserId) { // 현재 사용자 계정이 아닌 경우에만
-                        userList.add(user) // 화면에 보여준다.
-                    }
-                }
-
-                binding.userRecyclerView.adapter = UserAdapter(userList)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // TODO
-            }
-        })
+        fetchUserList() // 파이어베이스 데이터베이스 사용자 리스트 정보 가져오기 (한 번만 가져오기)
     }
 
     private inner class UserHolder(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(user : User) {
-//            binding.userProfileImage.setImageResource()
+            // 프로필 이미지
+            if (user.profileImage.isNullOrBlank()) {
+                binding.userProfileImage.setImageResource(R.drawable.baseline_account_box_24)
+            } else {
+                Glide.with(requireContext()).load(user.profileImage).into(binding.userProfileImage)
+            }
+            
+            // 이름
             binding.userNameText.text = user.name
+            
+            // 상태메시지
             if (user.statusMessage.isNullOrBlank()) {
                 binding.userStatusMessageText.visibility = View.INVISIBLE
             } else {
@@ -100,6 +96,29 @@ class UserFragment : Fragment() {
             holder.bind(userList[position])
         }
 
+    }
+
+    private fun fetchUserList() {
+        database.child(Key.DB_USERS).addListenerForSingleValueEvent( object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) { // 메인 스레드에서 실행
+                val userList = mutableListOf<User>() // 화면에 보여줄 사용자를 담을 리스트
+
+                snapshot.children.forEach {
+                    val user = it.getValue(User::class.java)
+                    user ?: return
+
+                    if(user.id != currentUser.uid) { // 현재 사용자 계정이 아닌 경우에만
+                        userList.add(user) // 화면에 보여준다.
+                    }
+                }
+
+                binding.userRecyclerView.adapter = UserAdapter(userList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // TODO
+            }
+        })
     }
 
     companion object {

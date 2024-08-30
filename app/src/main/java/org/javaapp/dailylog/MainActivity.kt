@@ -86,5 +86,4 @@ class MainActivity : AppCompatActivity(), OnAddSelectedListener, OnLogSelectedLi
             .commit()
     }
 
-
 }
