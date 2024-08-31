@@ -3,18 +3,17 @@ package org.javaapp.dailylog
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.databinding.ActivityMainBinding
-import org.javaapp.dailylog.log.AddLogFragment
+import org.javaapp.dailylog.log.AddEditLogFragment
 import org.javaapp.dailylog.log.CommentLogFragment
 import org.javaapp.dailylog.log.LogFragment
 import org.javaapp.dailylog.my.MyFragment
 import org.javaapp.dailylog.user.UserFragment
 
-class MainActivity : AppCompatActivity(), OnAddSelectedListener, OnLogSelectedListener {
+class MainActivity : AppCompatActivity(), OnAddSelectedListener, OnLogSelectedListener, OnEditSelectedListener {
     private lateinit var binding : ActivityMainBinding
     private var currentUser: FirebaseUser? = null
 
@@ -80,7 +79,14 @@ class MainActivity : AppCompatActivity(), OnAddSelectedListener, OnLogSelectedLi
 
     override fun onAddSelected() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, AddLogFragment())
+            .replace(R.id.fragment_container, AddEditLogFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    override fun onEditSelected(logId : String) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, AddEditLogFragment(logId))
             .addToBackStack(null)
             .commit()
     }

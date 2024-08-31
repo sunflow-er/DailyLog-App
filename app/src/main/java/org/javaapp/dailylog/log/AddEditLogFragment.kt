@@ -18,7 +18,10 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import org.javaapp.dailylog.Key
@@ -30,7 +33,7 @@ import java.util.UUID
 
 private const val PICK_IMAGE_REQUEST = 1
 
-class AddLogFragment : Fragment() {
+class AddEditLogFragment(private val logId : String? = null) : Fragment() {
     private lateinit var binding : FragmentAddLogBinding
     private lateinit var currentUser : FirebaseUser // user
     private lateinit var database : DatabaseReference // database
@@ -58,6 +61,10 @@ class AddLogFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (logId != null) { // Edit
+            fetchMyLog(logId)
+        }
+
         setupAppBarMenu() // 앱바 메뉴 인플레이트 및 리스너 설정
 
         // 이미지 추가하기
@@ -67,7 +74,7 @@ class AddLogFragment : Fragment() {
 
         // 업로드 버튼 리스너 설정
         binding.addButton.setOnClickListener {
-            uploadLog() // 작성한 로그 업로드
+            uploadLog(logId)
         }
     }
 
@@ -96,37 +103,68 @@ class AddLogFragment : Fragment() {
         startActivityForResult(intent, PICK_IMAGE_REQUEST) // 갤러리 열기
     }
 
-    private fun uploadLog() {
+    private fun uploadLog(logId : String?) {
         formattedText = formatText(binding.addTextEdit.text.toString())
 
         if (imageUri == null && formattedText.isNullOrBlank()) {
             Toast.makeText(requireContext(), "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
         } else {
-            val logId = UUID.randomUUID().toString() // 로그 아이디
-            val (date, time) = formatDateTimeNow() // 포맷팅된 현재 날짜 및 시간
-            val timeStamp = System.currentTimeMillis().toString() // 타임스탬프
+            if (logId != null) { // Edit
+                val logEdit = mutableMapOf<String, Any>()
+                logEdit["text"] = formattedText
+                logEdit["image"] = imageUri?.toString() ?: ""
 
-            // 저장할 로그 정보
-            val log = mutableMapOf<String, Any>()
-            log["id"] = logId
-            log["userId"] = currentUser.uid
-            log["date"] = date
-            log["time"] = time
-            log["text"] = formattedText
-            log["image"] = imageUri?.toString() ?: ""
-            log["likeCount"] = 0
-            log["commentCount"] = 0
-            log["timeStamp"] = timeStamp
+                database.child(Key.DB_LOGS).child(logId).updateChildren(logEdit)
 
-            // 파이어베이스 데이터베이스에 로그 정보 저장
-            database
-                .child(Key.DB_LOGS)
-                .child(logId)
-                .setValue(log)
+            } else { // Add
+                val newLogId = UUID.randomUUID().toString() // 로그 아이디
+                val (date, time) = formatDateTimeNow() // 포맷팅된 현재 날짜 및 시간
+                val timeStamp = System.currentTimeMillis().toString() // 타임스탬프
+
+                // 저장할 로그 정보
+                val logAdd = mutableMapOf<String, Any>()
+                logAdd["id"] = newLogId
+                logAdd["userId"] = currentUser.uid
+                logAdd["date"] = date
+                logAdd["time"] = time
+                logAdd["text"] = formattedText
+                logAdd["image"] = imageUri?.toString() ?: ""
+                logAdd["likeCount"] = 0
+                logAdd["commentCount"] = 0
+                logAdd["timeStamp"] = timeStamp
+
+                // 파이어베이스 데이터베이스에 로그 정보 저장
+                database.child(Key.DB_LOGS).child(newLogId).setValue(logAdd)
+            }
 
             // 프래그먼트 종료
             requireActivity().supportFragmentManager.popBackStack()
         }
+    }
+
+    private fun fetchMyLog(logId: String) {
+        database.child(Key.DB_LOGS).child(logId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (isAdded) { // 프래그먼트가 현재 액티비티에 추가(연결)되었는지 확인, 프래그먼트가 활성 상태인지 확인
+                    val log = snapshot.getValue(Log::class.java)
+                    log ?: return
+
+                    // 기존 이미지
+                    if (log.image.isNullOrBlank()) {
+                        binding.addImage.setImageResource(R.drawable.baseline_image_48)
+                    } else {
+                        Glide.with(requireContext()).load(log.image).into(binding.addImage)
+                    }
+
+                    // 기존 텍스트
+                    binding.addTextEdit.setText(log.text)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+        })
     }
 
     // 갤러리에서 선택한 이미지 처리

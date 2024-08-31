@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/add_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="96dp"
         android:background="@drawable/round_rect_background"
         android:padding="16dp"
         android:src="@drawable/baseline_image_48"
